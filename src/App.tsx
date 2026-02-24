@@ -39,6 +39,20 @@ interface DatabaseStatistics {
 }
 
 type ThemeIdentifier = 'midnight' | 'aurora' | 'sunset' | 'light' | 'crimson';
+type NsfwCoverBlurMode = 'auto' | 'always' | 'never';
+type DefaultTagSpoilerLevel = 0 | 1 | 2;
+type DefaultListSortField = 'default' | 'title' | 'released' | 'rating' | 'votecount' | 'id';
+type DefaultListSortDirection = 'asc' | 'desc';
+
+interface UserDisplayPreferences {
+  nsfwCoverBlurMode: NsfwCoverBlurMode;
+  defaultTagSpoilerLevel: DefaultTagSpoilerLevel;
+  rememberListSettings: boolean;
+  defaultListSortField: DefaultListSortField;
+  defaultListSortDirection: DefaultListSortDirection;
+  defaultListOnlyWithScreenshots: boolean;
+  defaultListOnlyWithDescription: boolean;
+}
 
 interface DetailViewErrorBoundaryProperties {
   children: React.ReactNode;
@@ -89,6 +103,7 @@ export default function RootApplication() {
   const AUTH_TOKEN_STORAGE_KEY = 'vndb_client_auth_token_v1';
   const ONBOARDING_COMPLETED_STORAGE_KEY = 'vndb_client_onboarding_completed_v1';
   const THEME_STORAGE_KEY = 'vndb_client_theme_v1';
+  const DISPLAY_PREFERENCES_STORAGE_KEY = 'vndb_client_display_preferences_v1';
   const THEME_OPTIONS: Array<{ id: ThemeIdentifier; label: string }> = [
     { id: 'midnight', label: 'Midnight (Dark)' },
     { id: 'aurora', label: 'Aurora (Dark)' },
@@ -96,6 +111,15 @@ export default function RootApplication() {
     { id: 'light', label: 'Paper (Light)' },
     { id: 'crimson', label: 'Crimson (Black/Red)' }
   ];
+  const DEFAULT_DISPLAY_PREFERENCES: UserDisplayPreferences = {
+    nsfwCoverBlurMode: 'auto',
+    defaultTagSpoilerLevel: 0,
+    rememberListSettings: true,
+    defaultListSortField: 'default',
+    defaultListSortDirection: 'desc',
+    defaultListOnlyWithScreenshots: false,
+    defaultListOnlyWithDescription: false
+  };
   const [activeVisualNovelIdentifier, setActiveVisualNovelIdentifier] = useState<string | null>(null);
   const [activeTagSearchRequest, setActiveTagSearchRequest] = useState<TagSearchRequest | null>(null);
   const [activeDeveloperSearchRequest, setActiveDeveloperSearchRequest] = useState<DeveloperSearchRequest | null>(null);
@@ -114,6 +138,7 @@ export default function RootApplication() {
   const [isDatabaseStatisticsLoading, setIsDatabaseStatisticsLoading] = useState<boolean>(false);
   const [databaseStatisticsErrorMessage, setDatabaseStatisticsErrorMessage] = useState<string | null>(null);
   const [isBackToTopButtonVisible, setIsBackToTopButtonVisible] = useState<boolean>(false);
+  const [displayPreferences, setDisplayPreferences] = useState<UserDisplayPreferences>(DEFAULT_DISPLAY_PREFERENCES);
 
   function completeOnboarding() {
     window.localStorage.setItem(ONBOARDING_COMPLETED_STORAGE_KEY, 'true');
@@ -202,9 +227,49 @@ export default function RootApplication() {
   }, []);
 
   useEffect(() => {
+    try {
+      const storedDisplayPreferences = window.localStorage.getItem(DISPLAY_PREFERENCES_STORAGE_KEY);
+      if (!storedDisplayPreferences) {
+        return;
+      }
+
+      const parsedDisplayPreferences = JSON.parse(storedDisplayPreferences) as Partial<UserDisplayPreferences>;
+      setDisplayPreferences({
+        nsfwCoverBlurMode:
+          parsedDisplayPreferences.nsfwCoverBlurMode === 'always' ||
+          parsedDisplayPreferences.nsfwCoverBlurMode === 'never'
+            ? parsedDisplayPreferences.nsfwCoverBlurMode
+            : 'auto',
+        defaultTagSpoilerLevel:
+          parsedDisplayPreferences.defaultTagSpoilerLevel === 1 || parsedDisplayPreferences.defaultTagSpoilerLevel === 2
+            ? parsedDisplayPreferences.defaultTagSpoilerLevel
+            : 0,
+        rememberListSettings: parsedDisplayPreferences.rememberListSettings !== false,
+        defaultListSortField:
+          parsedDisplayPreferences.defaultListSortField === 'title' ||
+          parsedDisplayPreferences.defaultListSortField === 'released' ||
+          parsedDisplayPreferences.defaultListSortField === 'rating' ||
+          parsedDisplayPreferences.defaultListSortField === 'votecount' ||
+          parsedDisplayPreferences.defaultListSortField === 'id'
+            ? parsedDisplayPreferences.defaultListSortField
+            : 'default',
+        defaultListSortDirection: parsedDisplayPreferences.defaultListSortDirection === 'asc' ? 'asc' : 'desc',
+        defaultListOnlyWithScreenshots: Boolean(parsedDisplayPreferences.defaultListOnlyWithScreenshots),
+        defaultListOnlyWithDescription: Boolean(parsedDisplayPreferences.defaultListOnlyWithDescription)
+      });
+    } catch {
+      setDisplayPreferences(DEFAULT_DISPLAY_PREFERENCES);
+    }
+  }, []);
+
+  useEffect(() => {
     document.documentElement.setAttribute('data-theme', activeThemeIdentifier);
     window.localStorage.setItem(THEME_STORAGE_KEY, activeThemeIdentifier);
   }, [activeThemeIdentifier]);
+
+  useEffect(() => {
+    window.localStorage.setItem(DISPLAY_PREFERENCES_STORAGE_KEY, JSON.stringify(displayPreferences));
+  }, [displayPreferences]);
 
   useEffect(() => {
     if (!isMenuPanelVisible || databaseStatistics) {
@@ -473,6 +538,113 @@ export default function RootApplication() {
           </div>
         </div>
 
+        <div className="theme-settings-panel">
+          <p className="theme-settings-title">Preferences</p>
+          <div className="preferences-grid">
+            <label className="preferences-label">
+              NSFW Cover Blur
+              <select
+                className="preferences-select"
+                value={displayPreferences.nsfwCoverBlurMode}
+                onChange={(changeEvent) => setDisplayPreferences((currentPreferences) => ({
+                  ...currentPreferences,
+                  nsfwCoverBlurMode: changeEvent.target.value as NsfwCoverBlurMode
+                }))}
+              >
+                <option value="auto">Blur explicit, tap to reveal</option>
+                <option value="always">Always blur explicit</option>
+                <option value="never">Never blur explicit</option>
+              </select>
+            </label>
+
+            <label className="preferences-label">
+              Default Tag Spoilers
+              <select
+                className="preferences-select"
+                value={displayPreferences.defaultTagSpoilerLevel}
+                onChange={(changeEvent) => setDisplayPreferences((currentPreferences) => ({
+                  ...currentPreferences,
+                  defaultTagSpoilerLevel: Number(changeEvent.target.value) as DefaultTagSpoilerLevel
+                }))}
+              >
+                <option value={0}>Hide spoilers</option>
+                <option value={1}>Show minor spoilers</option>
+                <option value={2}>Show all spoilers</option>
+              </select>
+            </label>
+
+            <label className="preferences-label">
+              Default Sort Field
+              <select
+                className="preferences-select"
+                value={displayPreferences.defaultListSortField}
+                onChange={(changeEvent) => setDisplayPreferences((currentPreferences) => ({
+                  ...currentPreferences,
+                  defaultListSortField: changeEvent.target.value as DefaultListSortField
+                }))}
+              >
+                <option value="default">Default (Relevance)</option>
+                <option value="title">Title</option>
+                <option value="released">Release Date</option>
+                <option value="rating">Rating</option>
+                <option value="votecount">Vote Count</option>
+                <option value="id">ID</option>
+              </select>
+            </label>
+
+            <label className="preferences-label">
+              Default Sort Direction
+              <select
+                className="preferences-select"
+                value={displayPreferences.defaultListSortDirection}
+                onChange={(changeEvent) => setDisplayPreferences((currentPreferences) => ({
+                  ...currentPreferences,
+                  defaultListSortDirection: changeEvent.target.value as DefaultListSortDirection
+                }))}
+              >
+                <option value="desc">Descending</option>
+                <option value="asc">Ascending</option>
+              </select>
+            </label>
+
+            <label className="preferences-checkbox-label">
+              <input
+                type="checkbox"
+                checked={displayPreferences.defaultListOnlyWithScreenshots}
+                onChange={(changeEvent) => setDisplayPreferences((currentPreferences) => ({
+                  ...currentPreferences,
+                  defaultListOnlyWithScreenshots: changeEvent.target.checked
+                }))}
+              />
+              Default filter: only with screenshots
+            </label>
+
+            <label className="preferences-checkbox-label">
+              <input
+                type="checkbox"
+                checked={displayPreferences.defaultListOnlyWithDescription}
+                onChange={(changeEvent) => setDisplayPreferences((currentPreferences) => ({
+                  ...currentPreferences,
+                  defaultListOnlyWithDescription: changeEvent.target.checked
+                }))}
+              />
+              Default filter: only with descriptions
+            </label>
+
+            <label className="preferences-checkbox-label">
+              <input
+                type="checkbox"
+                checked={displayPreferences.rememberListSettings}
+                onChange={(changeEvent) => setDisplayPreferences((currentPreferences) => ({
+                  ...currentPreferences,
+                  rememberListSettings: changeEvent.target.checked
+                }))}
+              />
+              Remember last sort/filter after changes
+            </label>
+          </div>
+        </div>
+
         <p className="menu-drawer-note">VNDB API v2 uses API tokens for authentication.</p>
 
         <section className="menu-stats-panel">
@@ -531,6 +703,12 @@ export default function RootApplication() {
             onAddVisualNovelToUserList={handleAddVisualNovelToUserList}
             onUpdateVisualNovelUserListStatus={handleUpdateVisualNovelUserListStatus}
             userListRefreshToken={userListRefreshToken}
+            nsfwCoverBlurMode={displayPreferences.nsfwCoverBlurMode}
+            rememberListSettings={displayPreferences.rememberListSettings}
+            defaultListSortField={displayPreferences.defaultListSortField}
+            defaultListSortDirection={displayPreferences.defaultListSortDirection}
+            defaultListOnlyWithScreenshots={displayPreferences.defaultListOnlyWithScreenshots}
+            defaultListOnlyWithDescription={displayPreferences.defaultListOnlyWithDescription}
           />
         </div>
 
@@ -550,6 +728,7 @@ export default function RootApplication() {
                 authenticatedSession={authenticatedSession}
                 onAddVisualNovelToUserList={handleAddVisualNovelToUserList}
                 onUserListRefreshRequested={handleUserListRefreshRequest}
+                defaultTagSpoilerLevel={displayPreferences.defaultTagSpoilerLevel}
               />
             </DetailViewErrorBoundary>
           </div>

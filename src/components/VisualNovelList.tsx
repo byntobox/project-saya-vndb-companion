@@ -31,6 +31,12 @@ interface VisualNovelListProperties {
     username: string;
     permissions: string[];
   } | null;
+  nsfwCoverBlurMode: 'auto' | 'always' | 'never';
+  rememberListSettings: boolean;
+  defaultListSortField: 'default' | 'title' | 'released' | 'rating' | 'votecount' | 'id';
+  defaultListSortDirection: 'asc' | 'desc';
+  defaultListOnlyWithScreenshots: boolean;
+  defaultListOnlyWithDescription: boolean;
 }
 
 interface ListQueryDescriptor {
@@ -63,7 +69,13 @@ export function VisualNovelList({
   userListRefreshToken,
   tagSearchRequest,
   developerSearchRequest,
-  authenticatedSession
+  authenticatedSession,
+  nsfwCoverBlurMode,
+  rememberListSettings,
+  defaultListSortField,
+  defaultListSortDirection,
+  defaultListOnlyWithScreenshots,
+  defaultListOnlyWithDescription
 }: VisualNovelListProperties) {
   const searchInputReference = useRef<HTMLInputElement | null>(null);
   const themedPrimaryButtonStyle = {
@@ -87,15 +99,15 @@ export function VisualNovelList({
     return {
       languages: [],
       originalLanguage: '',
-      onlyWithScreenshots: false,
-      onlyWithDescription: false
+      onlyWithScreenshots: defaultListOnlyWithScreenshots,
+      onlyWithDescription: defaultListOnlyWithDescription
     };
   }
 
   const RESULTS_PER_PAGE = 20;
   const DEFAULT_SORT_STATE: ListSortState = {
-    field: 'default',
-    direction: 'desc'
+    field: defaultListSortField,
+    direction: defaultListSortDirection
   };
   const SORT_FIELD_OPTIONS: Array<{ value: ListSortState['field']; label: string }> = [
     { value: 'default', label: 'Default (Relevance)' },
@@ -111,10 +123,15 @@ export function VisualNovelList({
   const [networkErrorMessage, setNetworkErrorMessage] = useState<string | null>(null);
   const [activeSearchTerm, setActiveSearchTerm] = useState<string>('');
   function createInitialFilterState(): ListFilterState {
+    const configuredDefaultFilterState = createDefaultFilterState();
     try {
+      if (!rememberListSettings) {
+        return configuredDefaultFilterState;
+      }
+
       const storedFilterState = window.localStorage.getItem(FILTER_STORAGE_KEY);
       if (!storedFilterState) {
-        return createDefaultFilterState();
+        return configuredDefaultFilterState;
       }
 
       const parsedFilterState = JSON.parse(storedFilterState) as Partial<ListFilterState>;
@@ -125,15 +142,20 @@ export function VisualNovelList({
         onlyWithDescription: Boolean(parsedFilterState.onlyWithDescription)
       };
     } catch {
-      return createDefaultFilterState();
+      return configuredDefaultFilterState;
     }
   }
 
   function createInitialSortState(): ListSortState {
+    const configuredDefaultSortState = DEFAULT_SORT_STATE;
     try {
+      if (!rememberListSettings) {
+        return configuredDefaultSortState;
+      }
+
       const storedSortState = window.localStorage.getItem(SORT_STORAGE_KEY);
       if (!storedSortState) {
-        return DEFAULT_SORT_STATE;
+        return configuredDefaultSortState;
       }
 
       const parsedSortState = JSON.parse(storedSortState) as Partial<ListSortState>;
@@ -152,7 +174,7 @@ export function VisualNovelList({
         direction: normalizedDirection
       };
     } catch {
-      return DEFAULT_SORT_STATE;
+      return configuredDefaultSortState;
     }
   }
 
@@ -395,9 +417,11 @@ export function VisualNovelList({
 
   function handleFilterReset() {
     const resetFilterState = createDefaultFilterState();
+    const resetSortState = DEFAULT_SORT_STATE;
     setDraftFilters(resetFilterState);
     setAppliedFilters(resetFilterState);
-    executeSearchWithCurrentQuery({ filters: resetFilterState });
+    setAppliedSort(resetSortState);
+    executeSearchWithCurrentQuery({ filters: resetFilterState, sort: resetSortState });
   }
 
   function handleSortFieldChange(sortField: ListSortState['field']) {
@@ -467,12 +491,22 @@ export function VisualNovelList({
   }, [isFilterPanelVisible, appliedFilters]);
 
   useEffect(() => {
+    if (!rememberListSettings) {
+      window.localStorage.removeItem(FILTER_STORAGE_KEY);
+      return;
+    }
+
     window.localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(appliedFilters));
-  }, [appliedFilters]);
+  }, [appliedFilters, rememberListSettings]);
 
   useEffect(() => {
+    if (!rememberListSettings) {
+      window.localStorage.removeItem(SORT_STORAGE_KEY);
+      return;
+    }
+
     window.localStorage.setItem(SORT_STORAGE_KEY, JSON.stringify(appliedSort));
-  }, [appliedSort]);
+  }, [appliedSort, rememberListSettings]);
 
   useEffect(() => {
     window.localStorage.setItem(RECENT_SEARCHES_STORAGE_KEY, JSON.stringify(recentSearchTerms));
@@ -506,6 +540,35 @@ export function VisualNovelList({
       window.removeEventListener('keydown', handleGlobalShortcutKeyDown);
     };
   }, [isFilterPanelVisible]);
+
+  useEffect(() => {
+    // When remember mode is disabled, preference changes should immediately become active.
+    if (rememberListSettings || isViewingUserList) {
+      return;
+    }
+
+    const resetFilterState = createDefaultFilterState();
+    const resetSortState = DEFAULT_SORT_STATE;
+    setDraftFilters(resetFilterState);
+    setAppliedFilters(resetFilterState);
+    setAppliedSort(resetSortState);
+    executeDataFetchOperation(
+      {
+        ...activeQueryDescriptor,
+        filters: resetFilterState,
+        sort: resetSortState
+      },
+      1,
+      false
+    );
+  }, [
+    rememberListSettings,
+    isViewingUserList,
+    defaultListOnlyWithScreenshots,
+    defaultListOnlyWithDescription,
+    defaultListSortField,
+    defaultListSortDirection
+  ]);
 
   useEffect(() => {
     // Initial bootstrap search for default list content.
@@ -745,8 +808,13 @@ export function VisualNovelList({
     setIsViewingUserList(false);
     setUserListStatusByIdentifier({});
     setActiveSearchTerm('');
-    executeDataFetchOperation({ kind: 'text', term: '', filters: appliedFilters, sort: appliedSort }, 1, false);
-  }, [homeNavigationRequestToken, appliedFilters, appliedSort]);
+    const resetFilterState = createDefaultFilterState();
+    const resetSortState = DEFAULT_SORT_STATE;
+    setDraftFilters(resetFilterState);
+    setAppliedFilters(resetFilterState);
+    setAppliedSort(resetSortState);
+    executeDataFetchOperation({ kind: 'text', term: '', filters: resetFilterState, sort: resetSortState }, 1, false);
+  }, [homeNavigationRequestToken, defaultListOnlyWithScreenshots, defaultListOnlyWithDescription, defaultListSortField, defaultListSortDirection]);
 
   useEffect(() => {
     // External tag search requests should replace current list context immediately.
@@ -1107,6 +1175,7 @@ export function VisualNovelList({
                     onAddVisualNovelToUserList={onAddVisualNovelToUserList}
                     canAddToUserList={Boolean(authenticatedSession && hasListWritePermission)}
                     canEditExistingUserListEntry={Boolean(isViewingUserList && authenticatedSession && hasListWritePermission)}
+                    nsfwCoverBlurMode={nsfwCoverBlurMode}
                     isAlreadyInUserList={userListIdentifierSet.has(
                       novelEntry.id.toLowerCase().startsWith('v') ? novelEntry.id.toLowerCase() : `v${novelEntry.id.toLowerCase()}`
                     )}

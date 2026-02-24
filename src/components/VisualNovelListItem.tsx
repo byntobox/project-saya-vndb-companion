@@ -10,6 +10,7 @@ interface VisualNovelListItemProperties {
   onAddVisualNovelToUserList: (visualNovelIdentifier: string, labelIdentifier?: number) => Promise<void>;
   canAddToUserList: boolean;
   canEditExistingUserListEntry: boolean;
+  nsfwCoverBlurMode: 'auto' | 'always' | 'never';
   isAlreadyInUserList: boolean;
   initialStatusLabelIdentifier: number;
   onMarkedAsAdded: (visualNovelIdentifier: string) => void;
@@ -26,6 +27,7 @@ export function VisualNovelListItem({
   onAddVisualNovelToUserList,
   canAddToUserList,
   canEditExistingUserListEntry,
+  nsfwCoverBlurMode,
   isAlreadyInUserList,
   initialStatusLabelIdentifier,
   onMarkedAsAdded,
@@ -46,7 +48,8 @@ export function VisualNovelListItem({
   const [selectedStatusLabelIdentifier, setSelectedStatusLabelIdentifier] = useState<number>(initialStatusLabelIdentifier);
 
   const hasExplicitContentFlag = visualNovelData.image && visualNovelData.image.sexual > 1.0;
-  const requiresBlurFilter = hasExplicitContentFlag && !isImageExplicitlyRevealed;
+  const shouldAllowManualReveal = nsfwCoverBlurMode === 'auto';
+  const requiresBlurFilter = hasExplicitContentFlag && nsfwCoverBlurMode !== 'never' && (nsfwCoverBlurMode === 'always' || !isImageExplicitlyRevealed);
 
   useEffect(() => {
     setSelectedStatusLabelIdentifier(initialStatusLabelIdentifier);
@@ -129,7 +132,7 @@ export function VisualNovelListItem({
         </div>
 
         {/* If the image requires a blur, we render an overlay with an interactive reveal button */}
-        {requiresBlurFilter && (
+        {requiresBlurFilter && shouldAllowManualReveal && (
           <div className={styles.explicitContentOverlay} onClick={handleOverlayRevealClick}>
             <button 
               type="button"

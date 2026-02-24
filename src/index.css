@@ -344,6 +344,37 @@ html[data-device='desktop'][data-orientation='landscape'] .application-container
   border-color: rgba(124, 168, 255, 0.62);
 }
 
+.preferences-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.preferences-label {
+  display: grid;
+  gap: 4px;
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.preferences-select {
+  width: 100%;
+  padding: 8px 9px;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: rgba(8, 14, 32, 0.62);
+  color: var(--text-primary);
+  font-size: 0.76rem;
+}
+
+.preferences-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-primary);
+  font-size: 0.75rem;
+}
+
 .menu-auth-block {
   display: flex;
   flex-direction: column;

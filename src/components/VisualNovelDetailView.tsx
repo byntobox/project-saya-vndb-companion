@@ -27,6 +27,7 @@ interface VisualNovelDetailViewProperties {
   } | null;
   onAddVisualNovelToUserList: (visualNovelIdentifier: string, labelIdentifier?: number) => Promise<void>;
   onUserListRefreshRequested: () => void;
+  defaultTagSpoilerLevel: 0 | 1 | 2;
 }
 
 // This component strictly manages the lifecycle and presentation of a single detailed record.
@@ -39,7 +40,8 @@ export function VisualNovelDetailView({
   onDeveloperSelection,
   authenticatedSession,
   onAddVisualNovelToUserList,
-  onUserListRefreshRequested
+  onUserListRefreshRequested,
+  defaultTagSpoilerLevel
 }: VisualNovelDetailViewProperties) {
   type TagCategoryFilter = 'all' | 'cont' | 'ero' | 'tech';
   const themedPrimaryButtonStyle = {
@@ -63,7 +65,7 @@ export function VisualNovelDetailView({
   const [areStoreLinksVisible, setAreStoreLinksVisible] = useState<boolean>(false);
   const [areDevelopersVisible, setAreDevelopersVisible] = useState<boolean>(false);
   const [areRelatedTitlesVisible, setAreRelatedTitlesVisible] = useState<boolean>(false);
-  const [maxVisibleTagSpoilerLevel, setMaxVisibleTagSpoilerLevel] = useState<0 | 1 | 2>(0);
+  const [maxVisibleTagSpoilerLevel, setMaxVisibleTagSpoilerLevel] = useState<0 | 1 | 2>(defaultTagSpoilerLevel);
   const [activeTagCategoryFilter, setActiveTagCategoryFilter] = useState<TagCategoryFilter>('all');
   const [tagCategoryByIdentifier, setTagCategoryByIdentifier] = useState<Record<string, string>>({});
   const [isAddOperationInFlight, setIsAddOperationInFlight] = useState<boolean>(false);
@@ -99,7 +101,7 @@ export function VisualNovelDetailView({
     setAreStoreLinksVisible(false);
     setAreDevelopersVisible(false);
     setAreRelatedTitlesVisible(false);
-    setMaxVisibleTagSpoilerLevel(0);
+    setMaxVisibleTagSpoilerLevel(defaultTagSpoilerLevel);
     setActiveTagCategoryFilter('all');
     setTagCategoryByIdentifier({});
     setAddOperationMessage(null);
@@ -194,6 +196,10 @@ export function VisualNovelDetailView({
       hasLifecycleBeenCancelled = true;
     };
   }, [visualNovelIdentifier]);
+
+  useEffect(() => {
+    setMaxVisibleTagSpoilerLevel(defaultTagSpoilerLevel);
+  }, [defaultTagSpoilerLevel]);
 
   // Lightweight membership probe used to switch "Add" vs "Already in My List" state on detail screen.
   useEffect(() => {
