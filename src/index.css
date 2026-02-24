@@ -168,9 +168,9 @@ body {
 }
 
 html[data-device='desktop'][data-orientation='landscape'] .application-container {
-  width: min(1460px, 100%);
-  padding-left: 26px;
-  padding-right: 26px;
+  width: min(1840px, 100%);
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 .minimal-topbar {
@@ -259,6 +259,52 @@ html[data-device='desktop'][data-orientation='landscape'] .application-container
   margin: 0 0 10px;
   color: var(--text-secondary);
   font-size: 0.8rem;
+}
+
+.menu-stats-panel {
+  margin: 0 0 10px;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-elevated);
+}
+
+.menu-stats-title {
+  margin: 0 0 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.menu-stats-status {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+}
+
+.menu-stats-error {
+  margin: 0;
+  color: #ffb3c6;
+  font-size: 0.76rem;
+}
+
+.menu-stats-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.menu-stats-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.78rem;
+}
+
+.menu-stats-list li span {
+  color: var(--text-secondary);
 }
 
 .theme-settings-panel {

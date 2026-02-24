@@ -495,6 +495,16 @@
   max-width: 760px;
 }
 
+.detailSectionsGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+
+.detailSectionFull {
+  grid-column: 1 / -1;
+}
+
 .detailCoverImage {
   width: 100%;
   max-width: 340px;
@@ -1063,7 +1073,7 @@
 
 /* Desktop landscape: expand list density and present detail hero in two columns. */
 :global(html[data-device='desktop'][data-orientation='landscape']) .interfaceContainerBoundary {
-  max-width: 1320px;
+  max-width: 1720px;
 }
 
 :global(html[data-device='desktop'][data-orientation='landscape']) .visualNovelResultsList {
@@ -1072,11 +1082,11 @@
 }
 
 :global(html[data-device='desktop'][data-orientation='landscape']) .detailHeroLayout {
-  grid-template-columns: minmax(280px, 360px) minmax(380px, 1fr);
+  grid-template-columns: minmax(320px, 430px) minmax(520px, 1fr);
   justify-content: center;
   align-items: start;
-  gap: 18px;
-  max-width: 980px;
+  gap: 22px;
+  max-width: 1500px;
   margin: 0 auto;
 }
 
@@ -1086,11 +1096,46 @@
 
 :global(html[data-device='desktop'][data-orientation='landscape']) .detailHeroInfo {
   max-width: 100%;
+  display: grid;
+  align-content: start;
+  justify-items: start;
+}
+
+:global(html[data-device='desktop'][data-orientation='landscape']) .detailSectionsGrid {
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 0 18px;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+/* In landscape grids, remove auto-centering margins so cards actually fill column width. */
+:global(html[data-device='desktop'][data-orientation='landscape']) .detailSectionsGrid > .detailDescriptionSection,
+:global(html[data-device='desktop'][data-orientation='landscape']) .detailSectionsGrid > .detailTagSection,
+:global(html[data-device='desktop'][data-orientation='landscape']) .detailSectionsGrid > .detailScreenshotSection,
+:global(html[data-device='desktop'][data-orientation='landscape']) .detailSectionsGrid > .detailRelatedSection,
+:global(html[data-device='desktop'][data-orientation='landscape']) .detailSectionsGrid > .detailContributorSection,
+:global(html[data-device='desktop'][data-orientation='landscape']) .detailSectionsGrid > .detailStoreLinkSection {
+  width: 100%;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 :global(html[data-device='desktop'][data-orientation='landscape']) .detailMetaRow,
 :global(html[data-device='desktop'][data-orientation='landscape']) .detailActionRow {
   justify-content: flex-start;
+}
+
+:global(html[data-device='desktop'][data-orientation='landscape']) .detailContentCentered {
+  text-align: left;
+}
+
+:global(html[data-device='desktop'][data-orientation='landscape']) .detailTitleText {
+  text-align: left;
+}
+
+:global(html[data-device='desktop'][data-orientation='landscape']) .backToSearchButton {
+  margin-bottom: 12px;
 }
 
 :global(html[data-device='desktop'][data-orientation='landscape']) .detailDescriptionSection,
@@ -1099,7 +1144,8 @@
 :global(html[data-device='desktop'][data-orientation='landscape']) .detailRelatedSection,
 :global(html[data-device='desktop'][data-orientation='landscape']) .detailContributorSection,
 :global(html[data-device='desktop'][data-orientation='landscape']) .detailStoreLinkSection {
-  max-width: 980px;
+  max-width: 100%;
+  margin-top: 14px;
 }
 
 /* Mobile landscape: tighten spacing and split detail hero for better horizontal use. */
@@ -1145,6 +1191,48 @@
 
 :global(html[data-device='mobile'][data-orientation='landscape']) .detailActionRow {
   justify-content: flex-start;
+}
+
+/* Tablet landscape gets a compact two-column content grid too. */
+@media (min-width: 860px) and (max-width: 1199px) and (orientation: landscape) {
+  .interfaceContainerBoundary {
+    max-width: 1180px;
+  }
+
+  .detailHeroLayout {
+    grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
+    gap: 14px;
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+
+  .detailSectionsGrid {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: 0 12px;
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+
+  .detailSectionsGrid > .detailDescriptionSection,
+  .detailSectionsGrid > .detailTagSection,
+  .detailSectionsGrid > .detailScreenshotSection,
+  .detailSectionsGrid > .detailRelatedSection,
+  .detailSectionsGrid > .detailContributorSection,
+  .detailSectionsGrid > .detailStoreLinkSection {
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .detailDescriptionSection,
+  .detailTagSection,
+  .detailScreenshotSection,
+  .detailRelatedSection,
+  .detailContributorSection,
+  .detailStoreLinkSection {
+    margin-top: 12px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

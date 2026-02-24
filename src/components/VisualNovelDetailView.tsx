@@ -710,78 +710,8 @@ export function VisualNovelDetailView({
         </div>
       </div>
 
-      <div className={styles.detailContributorSection}>
-        <h3 className={styles.sectionHeadingText}>Developers</h3>
-        {isSupplementalDataLoading && <p className={styles.detailActionMessage}>Loading developers...</p>}
-        {developerEntries.length > 0 ? (
-          <div className={styles.contributorChipRow}>
-            {developerEntries.map((developerEntry) => (
-              <button
-                key={`${developerEntry.id ?? developerEntry.name}-developer`}
-                type="button"
-                className={styles.contributorChipButton}
-                onClick={() => onDeveloperSelection(developerEntry.name, developerEntry.id)}
-              >
-                {developerEntry.name}
-              </button>
-            ))}
-          </div>
-        ) : (
-          <p>No developer data available.</p>
-        )}
-      </div>
-
-      <div className={styles.detailStoreLinkSection}>
-        <h3 className={styles.sectionHeadingText}>Where to Buy / Official Links</h3>
-        {isSupplementalDataLoading && <p className={styles.detailActionMessage}>Loading store links...</p>}
-        {!isSupplementalDataLoading && storeLinkEntries.length === 0 && (
-          <p>No store links available.</p>
-        )}
-        {storeLinkEntries.length > 0 && (
-          <ul className={styles.detailStoreLinkList}>
-            {storeLinkEntries.map((storeLinkEntry) => (
-              <li key={`${storeLinkEntry.url}-${storeLinkEntry.label}`} className={styles.detailStoreLinkListItem}>
-                <a
-                  href={storeLinkEntry.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.detailStoreLinkButton}
-                >
-                  <span className={styles.detailStoreLinkLabel}>{storeLinkEntry.label}</span>
-                  <span className={styles.detailStoreLinkMeta}>
-                    {storeLinkEntry.source ?? 'External'}
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      <div className={styles.detailRelatedSection}>
-        <h3 className={styles.sectionHeadingText}>Related Titles</h3>
-        {isSupplementalDataLoading && <p className={styles.detailActionMessage}>Loading related titles...</p>}
-        {relatedVisualNovelEntries.length > 0 ? (
-          <ul className={styles.relatedVisualNovelList}>
-            {relatedVisualNovelEntries.map((relationEntry) => (
-              <li key={`${relationEntry.id}-${relationEntry.relation}`} className={styles.relatedVisualNovelListItem}>
-                <button
-                  type="button"
-                  className={styles.relatedVisualNovelButton}
-                  onClick={() => onRelatedVisualNovelSelection(relationEntry.id)}
-                >
-                  <span className={styles.relatedVisualNovelRelationBadge}>{relationEntry.relationLabel}</span>
-                  <span className={styles.relatedVisualNovelTitleText}>{relationEntry.title}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No related titles available.</p>
-        )}
-      </div>
-
-      <div className={styles.detailDescriptionSection}>
+      <div className={styles.detailSectionsGrid}>
+      <div className={`${styles.detailDescriptionSection} ${styles.detailSectionFull}`}>
         <h3 className={styles.sectionHeadingText}>Description</h3>
         {detailedVisualNovelData.description ? (
           <div className={styles.detailDescriptionText}>
@@ -880,6 +810,33 @@ export function VisualNovelDetailView({
         )}
       </div>
 
+      <div className={styles.detailStoreLinkSection}>
+        <h3 className={styles.sectionHeadingText}>Where to Buy / Official Links</h3>
+        {isSupplementalDataLoading && <p className={styles.detailActionMessage}>Loading store links...</p>}
+        {!isSupplementalDataLoading && storeLinkEntries.length === 0 && (
+          <p>No store links available.</p>
+        )}
+        {storeLinkEntries.length > 0 && (
+          <ul className={styles.detailStoreLinkList}>
+            {storeLinkEntries.map((storeLinkEntry) => (
+              <li key={`${storeLinkEntry.url}-${storeLinkEntry.label}`} className={styles.detailStoreLinkListItem}>
+                <a
+                  href={storeLinkEntry.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.detailStoreLinkButton}
+                >
+                  <span className={styles.detailStoreLinkLabel}>{storeLinkEntry.label}</span>
+                  <span className={styles.detailStoreLinkMeta}>
+                    {storeLinkEntry.source ?? 'External'}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
       <div className={styles.detailScreenshotSection}>
         <button
           type="button"
@@ -916,6 +873,51 @@ export function VisualNovelDetailView({
             <p>No screenshots available.</p>
           )
         )}
+      </div>
+
+      <div className={styles.detailContributorSection}>
+        <h3 className={styles.sectionHeadingText}>Developers</h3>
+        {isSupplementalDataLoading && <p className={styles.detailActionMessage}>Loading developers...</p>}
+        {developerEntries.length > 0 ? (
+          <div className={styles.contributorChipRow}>
+            {developerEntries.map((developerEntry) => (
+              <button
+                key={`${developerEntry.id ?? developerEntry.name}-developer`}
+                type="button"
+                className={styles.contributorChipButton}
+                onClick={() => onDeveloperSelection(developerEntry.name, developerEntry.id)}
+              >
+                {developerEntry.name}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p>No developer data available.</p>
+        )}
+      </div>
+
+      <div className={`${styles.detailRelatedSection} ${styles.detailSectionFull}`}>
+        <h3 className={styles.sectionHeadingText}>Related Titles</h3>
+        {isSupplementalDataLoading && <p className={styles.detailActionMessage}>Loading related titles...</p>}
+        {relatedVisualNovelEntries.length > 0 ? (
+          <ul className={styles.relatedVisualNovelList}>
+            {relatedVisualNovelEntries.map((relationEntry) => (
+              <li key={`${relationEntry.id}-${relationEntry.relation}`} className={styles.relatedVisualNovelListItem}>
+                <button
+                  type="button"
+                  className={styles.relatedVisualNovelButton}
+                  onClick={() => onRelatedVisualNovelSelection(relationEntry.id)}
+                >
+                  <span className={styles.relatedVisualNovelRelationBadge}>{relationEntry.relationLabel}</span>
+                  <span className={styles.relatedVisualNovelTitleText}>{relationEntry.title}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No related titles available.</p>
+        )}
+      </div>
       </div>
       {activeScreenshotIndex !== null && normalizedScreenshotEntries[activeScreenshotIndex] && (
         <div
