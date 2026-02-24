@@ -283,9 +283,19 @@ export default function RootApplication() {
   }
 
   function handleLogout() {
+    const hasUserConfirmedLogout = window.confirm('Log out of your VNDB account?');
+    if (!hasUserConfirmedLogout) {
+      return;
+    }
+
     setAuthenticatedSession(null);
     setAuthenticationErrorMessage(null);
+    setTokenInputValue('');
+    setIsMenuPanelVisible(false);
+    setIsOnboardingRequired(true);
     window.localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
+    window.localStorage.removeItem(ONBOARDING_COMPLETED_STORAGE_KEY);
+    handleNavigateToListView();
   }
 
   async function handleAddVisualNovelToUserList(visualNovelIdentifier: string, labelIdentifier = 5) {
