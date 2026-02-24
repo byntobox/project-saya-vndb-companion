@@ -54,20 +54,20 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg}']
       },
       manifest: {
-        name: 'VNDB Client Application',
-        short_name: 'VNDB Client',
+        name: 'My VNDB',
+        short_name: 'My VNDB',
         description: 'A standalone interface for querying the Visual Novel Database.',
         theme_color: '#ffffff',
         background_color: '#ffffff',
         display: 'standalone', // This instructs the OS to hide the browser UI (URL bar, navigation).
         icons: [
           {
-            src: '/pwa-192x192.png',
+            src: '/icons/pwa-192x192.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: '/pwa-512x512.png',
+            src: '/icons/pwa-512x512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable' // Maskable icons ensure the OS can crop the image to fit its native shape (e.g., iOS squircle, Android circle).
