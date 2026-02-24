@@ -88,6 +88,23 @@ Vite will serve HTTPS if it finds:
 
 These files are ignored by git.
 
+## Branding and App Icons
+
+Icon asset paths are now centralized in `public/icons/`.
+
+Replace these files with your logo assets:
+
+- `public/icons/favicon.svg`
+- `public/icons/favicon-32x32.png`
+- `public/icons/apple-touch-icon.png`
+- `public/icons/pwa-192x192.png`
+- `public/icons/pwa-512x512.png`
+
+References are already wired in:
+
+- `index.html` (tab icon + Apple touch icon)
+- `vite.config.ts` PWA manifest icons
+
 ## API Notes
 
 - In development, API requests use Vite proxy path `/api/vndb` (configured in `vite.config.ts`) to avoid browser CORS issues on write endpoints.
