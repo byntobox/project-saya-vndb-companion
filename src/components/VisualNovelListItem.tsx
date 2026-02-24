@@ -119,6 +119,8 @@ export function VisualNovelListItem({
             <img 
               src={visualNovelData.image.thumbnail} 
               alt={`Cover art for ${visualNovelData.title}`} 
+              loading="lazy"
+              decoding="async"
               className={`${styles.coverImageElement} ${requiresBlurFilter ? styles.explicitContentBlur : ''}`} 
             />
           ) : (

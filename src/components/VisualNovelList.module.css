@@ -585,6 +585,11 @@
   margin-bottom: 16px;
 }
 
+.detailTopActionBar {
+  display: flex;
+  justify-content: center;
+}
+
 .floatingBackButton {
   position: fixed;
   left: max(22px, calc(env(safe-area-inset-left) + 18px));
@@ -1281,7 +1286,19 @@
 }
 
 :global(html[data-device='desktop'][data-orientation='landscape']) .backToSearchButton {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
+}
+
+:global(html[data-device='desktop'][data-orientation='landscape']) .detailTopActionBar {
+  position: sticky;
+  top: 10px;
+  z-index: 28;
+  justify-content: flex-start;
+}
+
+:global(html[data-device='desktop'][data-orientation='landscape']) .detailHeroInfo {
+  position: sticky;
+  top: 72px;
 }
 
 :global(html[data-device='desktop'][data-orientation='landscape']) .detailDescriptionSection,

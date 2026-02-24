@@ -65,6 +65,7 @@ export function VisualNovelList({
   developerSearchRequest,
   authenticatedSession
 }: VisualNovelListProperties) {
+  const searchInputReference = useRef<HTMLInputElement | null>(null);
   const themedPrimaryButtonStyle = {
     background: 'var(--button-primary-bg)',
     borderColor: 'var(--button-primary-border)',
@@ -478,6 +479,35 @@ export function VisualNovelList({
   }, [recentSearchTerms]);
 
   useEffect(() => {
+    // Global shortcut: "/" or Ctrl/Cmd+K focuses search, Escape closes filter panel.
+    function handleGlobalShortcutKeyDown(keyboardEvent: KeyboardEvent) {
+      const activeElement = document.activeElement;
+      const isUserTypingInInput =
+        activeElement instanceof HTMLInputElement ||
+        activeElement instanceof HTMLTextAreaElement ||
+        activeElement instanceof HTMLSelectElement ||
+        (activeElement instanceof HTMLElement && activeElement.isContentEditable);
+
+      if ((keyboardEvent.key === '/' || (keyboardEvent.key.toLowerCase() === 'k' && (keyboardEvent.metaKey || keyboardEvent.ctrlKey))) && !isUserTypingInInput) {
+        keyboardEvent.preventDefault();
+        searchInputReference.current?.focus();
+        searchInputReference.current?.select();
+        return;
+      }
+
+      if (keyboardEvent.key === 'Escape' && isFilterPanelVisible) {
+        keyboardEvent.preventDefault();
+        setIsFilterPanelVisible(false);
+      }
+    }
+
+    window.addEventListener('keydown', handleGlobalShortcutKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleGlobalShortcutKeyDown);
+    };
+  }, [isFilterPanelVisible]);
+
+  useEffect(() => {
     // Initial bootstrap search for default list content.
     if (tagSearchRequest) {
       return;
@@ -842,11 +872,13 @@ export function VisualNovelList({
 
       <form onSubmit={handleSearchFormSubmission} className={styles.searchControlBoundary}>
         <input 
+          ref={searchInputReference}
           type="text" 
           value={activeSearchTerm}
           onChange={(inputEvent) => setActiveSearchTerm(inputEvent.target.value)}
           placeholder="Search visual novels (e.g., Steins;Gate)..."
           className={styles.searchInputField}
+          aria-label="Search visual novels"
         />
         <button type="submit" className={styles.searchExecutionButton} style={themedPrimaryButtonStyle}>Search</button>
       </form>

@@ -113,6 +113,7 @@ export default function RootApplication() {
   const [databaseStatistics, setDatabaseStatistics] = useState<DatabaseStatistics | null>(null);
   const [isDatabaseStatisticsLoading, setIsDatabaseStatisticsLoading] = useState<boolean>(false);
   const [databaseStatisticsErrorMessage, setDatabaseStatisticsErrorMessage] = useState<string | null>(null);
+  const [isBackToTopButtonVisible, setIsBackToTopButtonVisible] = useState<boolean>(false);
 
   function completeOnboarding() {
     window.localStorage.setItem(ONBOARDING_COMPLETED_STORAGE_KEY, 'true');
@@ -254,6 +255,18 @@ export default function RootApplication() {
     return () => {
       window.removeEventListener('resize', updateViewportClassifications);
       window.removeEventListener('orientationchange', updateViewportClassifications);
+    };
+  }, []);
+
+  useEffect(() => {
+    function handleWindowScroll() {
+      setIsBackToTopButtonVisible(window.scrollY > 520);
+    }
+
+    handleWindowScroll();
+    window.addEventListener('scroll', handleWindowScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleWindowScroll);
     };
   }, []);
 
@@ -558,6 +571,17 @@ export default function RootApplication() {
             </div>
           </section>
         </div>
+      )}
+
+      {isBackToTopButtonVisible && (
+        <button
+          type="button"
+          className="back-to-top-button"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          aria-label="Back to top"
+        >
+          ↑ Top
+        </button>
       )}
     </main>
   );

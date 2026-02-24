@@ -631,9 +631,11 @@ export function VisualNovelDetailView({
         &larr;
       </button>
 
-      <button onClick={onNavigateHome} className={`${styles.searchExecutionButton} ${styles.backToSearchButton}`} style={themedPrimaryButtonStyle}>
-        &larr; Return to Home
-      </button>
+      <div className={styles.detailTopActionBar}>
+        <button onClick={onNavigateHome} className={`${styles.searchExecutionButton} ${styles.backToSearchButton}`} style={themedPrimaryButtonStyle}>
+          &larr; Return to Home
+        </button>
+      </div>
 
       <h2 className={styles.detailTitleText}>{detailedVisualNovelData.title}</h2>
 
@@ -643,6 +645,8 @@ export function VisualNovelDetailView({
             <img
               src={fullSizeCoverImageUrl}
               alt={`Cover art for ${detailedVisualNovelData.title}`}
+              loading="eager"
+              decoding="async"
               className={styles.detailCoverImage}
             />
           ) : (
@@ -899,6 +903,8 @@ export function VisualNovelDetailView({
                       <img
                         src={screenshotEntry.previewUrl}
                         alt={`Screenshot from ${detailedVisualNovelData.title}`}
+                        loading="lazy"
+                        decoding="async"
                         className={styles.detailScreenshotImage}
                       />
                     </button>
@@ -1033,6 +1039,7 @@ export function VisualNovelDetailView({
             <img
               src={normalizedScreenshotEntries[activeScreenshotIndex].fullSizeUrl}
               alt={`Screenshot ${activeScreenshotIndex + 1} from ${detailedVisualNovelData.title}`}
+              decoding="async"
               className={styles.screenshotLightboxImage}
             />
             <button
