@@ -593,7 +593,8 @@
 .detailTagSection,
 .detailScreenshotSection,
 .detailRelatedSection,
-.detailContributorSection {
+.detailContributorSection,
+.detailStoreLinkSection {
   margin: 18px auto 0;
   max-width: 760px;
   border-radius: 14px;
@@ -636,6 +637,45 @@
   padding: 0;
   display: grid;
   gap: 8px;
+}
+
+.detailStoreLinkList {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.detailStoreLinkListItem {
+  margin: 0;
+}
+
+.detailStoreLinkButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  text-align: left;
+  padding: 9px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(121, 164, 248, 0.33);
+  background: rgba(25, 37, 66, 0.68);
+  color: #e4ecff;
+  text-decoration: none;
+}
+
+.detailStoreLinkLabel {
+  font-size: 0.84rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.detailStoreLinkMeta {
+  font-size: 0.72rem;
+  opacity: 0.86;
+  white-space: nowrap;
 }
 
 .relatedVisualNovelListItem {
@@ -1057,7 +1097,8 @@
 :global(html[data-device='desktop'][data-orientation='landscape']) .detailTagSection,
 :global(html[data-device='desktop'][data-orientation='landscape']) .detailScreenshotSection,
 :global(html[data-device='desktop'][data-orientation='landscape']) .detailRelatedSection,
-:global(html[data-device='desktop'][data-orientation='landscape']) .detailContributorSection {
+:global(html[data-device='desktop'][data-orientation='landscape']) .detailContributorSection,
+:global(html[data-device='desktop'][data-orientation='landscape']) .detailStoreLinkSection {
   max-width: 980px;
 }
 

@@ -2,12 +2,13 @@ import { useState, useEffect, useRef } from 'react';
 import {
   fetchAuthenticatedUserVisualNovelListEntry,
   fetchVisualNovelCoreDetailsById,
+  fetchVisualNovelStoreLinksById,
   fetchVisualNovelSupplementalDetailsById,
   fetchTagMetadataByIds,
   removeVisualNovelFromAuthenticatedUserList,
   updateAuthenticatedUserVisualNovelStatusLabel
 } from '../api/visualNovelClient';
-import { type VisualNovelDetailedEntry } from '../types/apiTypes';
+import { type VisualNovelDetailedEntry, type VisualNovelExternalLinkEntry } from '../types/apiTypes';
 import { renderVndbDescription } from '../utils/renderVndbDescription';
 import styles from './VisualNovelList.module.css'; // Reusing our structural styles for consistency
 
@@ -55,6 +56,7 @@ export function VisualNovelDetailView({
   const [detailedVisualNovelData, setDetailedVisualNovelData] = useState<VisualNovelDetailedEntry | null>(null);
   const [isDataLoading, setIsDataLoading] = useState<boolean>(true);
   const [isSupplementalDataLoading, setIsSupplementalDataLoading] = useState<boolean>(true);
+  const [storeLinkEntries, setStoreLinkEntries] = useState<VisualNovelExternalLinkEntry[]>([]);
   const [networkErrorMessage, setNetworkErrorMessage] = useState<string | null>(null);
   const [areTagsVisible, setAreTagsVisible] = useState<boolean>(false);
   const [areScreenshotsVisible, setAreScreenshotsVisible] = useState<boolean>(false);
@@ -86,6 +88,7 @@ export function VisualNovelDetailView({
     let hasLifecycleBeenCancelled = false;
     setIsDataLoading(true);
     setIsSupplementalDataLoading(true);
+    setStoreLinkEntries([]);
     setNetworkErrorMessage(null);
     setDetailedVisualNovelData(null);
     setAreTagsVisible(false);
@@ -118,7 +121,10 @@ export function VisualNovelDetailView({
         }
 
         try {
-          const supplementalResponsePayload = await fetchVisualNovelSupplementalDetailsById(visualNovelIdentifier);
+          const [supplementalResponsePayload, storeLinksResponsePayload] = await Promise.all([
+            fetchVisualNovelSupplementalDetailsById(visualNovelIdentifier),
+            fetchVisualNovelStoreLinksById(visualNovelIdentifier).catch(() => [])
+          ]);
           const supplementalEntry = supplementalResponsePayload.results[0] as Partial<VisualNovelDetailedEntry> | undefined;
 
           if (!hasLifecycleBeenCancelled && supplementalEntry) {
@@ -132,6 +138,10 @@ export function VisualNovelDetailView({
                 ...supplementalEntry
               };
             });
+          }
+
+          if (!hasLifecycleBeenCancelled) {
+            setStoreLinkEntries(storeLinksResponsePayload);
           }
 
           const tagIdentifiers = (supplementalEntry?.tags ?? [])
@@ -718,6 +728,33 @@ export function VisualNovelDetailView({
           </div>
         ) : (
           <p>No developer data available.</p>
+        )}
+      </div>
+
+      <div className={styles.detailStoreLinkSection}>
+        <h3 className={styles.sectionHeadingText}>Where to Buy / Official Links</h3>
+        {isSupplementalDataLoading && <p className={styles.detailActionMessage}>Loading store links...</p>}
+        {!isSupplementalDataLoading && storeLinkEntries.length === 0 && (
+          <p>No store links available.</p>
+        )}
+        {storeLinkEntries.length > 0 && (
+          <ul className={styles.detailStoreLinkList}>
+            {storeLinkEntries.map((storeLinkEntry) => (
+              <li key={`${storeLinkEntry.url}-${storeLinkEntry.label}`} className={styles.detailStoreLinkListItem}>
+                <a
+                  href={storeLinkEntry.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.detailStoreLinkButton}
+                >
+                  <span className={styles.detailStoreLinkLabel}>{storeLinkEntry.label}</span>
+                  <span className={styles.detailStoreLinkMeta}>
+                    {storeLinkEntry.source ?? 'External'}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
         )}
       </div>
 

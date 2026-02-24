@@ -63,6 +63,14 @@ export interface VisualNovelContributorEntry {
   role?: string;
 }
 
+export interface VisualNovelExternalLinkEntry {
+  url: string;
+  label: string;
+  source?: string;
+  releaseId?: string;
+  releaseTitle?: string;
+}
+
 export interface VisualNovelCharacterEntry {
   id: string;
   name: string;

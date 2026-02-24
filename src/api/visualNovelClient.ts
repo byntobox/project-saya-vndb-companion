@@ -5,6 +5,7 @@ import type {
   UserVisualNovelListResponse,
   VisualNovelAuthInfoResponse,
   VisualNovelDetailedQueryResponse,
+  VisualNovelExternalLinkEntry,
   VisualNovelTagQueryResponse
 } from '../types/apiTypes';
 
@@ -15,6 +16,7 @@ const VNDB_API_BASE_URL = import.meta.env.DEV ? VNDB_PROXY_BASE_PATH : VNDB_DIRE
 const CACHE_TIME_TO_LIVE_MILLISECONDS = 5 * 60 * 1000;
 const listQueryCache = new Map<string, { expiresAt: number; payload: unknown }>();
 const detailQueryCache = new Map<string, { expiresAt: number; payload: unknown }>();
+const releaseQueryCache = new Map<string, { expiresAt: number; payload: unknown }>();
 const tagQueryCache = new Map<string, { expiresAt: number; payload: unknown }>();
 const characterQueryCache = new Map<string, { expiresAt: number; payload: unknown }>();
 const traitQueryCache = new Map<string, { expiresAt: number; payload: unknown }>();
@@ -171,6 +173,106 @@ export async function prefetchVisualNovelCoreDetailsById(visualNovelIdentifier: 
   } catch {
     // Prefetch is best-effort only.
   }
+}
+
+export async function fetchVisualNovelStoreLinksById(visualNovelIdentifier: string): Promise<VisualNovelExternalLinkEntry[]> {
+  const targetApiEndpoint = buildVndbApiUrl('/release');
+  const normalizedVisualNovelIdentifier = normalizeVisualNovelIdentifier(visualNovelIdentifier);
+  const requestPayload = {
+    filters: ["vn", "=", ["id", "=", normalizedVisualNovelIdentifier]],
+    fields: "id, title, released, official, freeware, extlinks.url, extlinks.label, extlinks.name, extlinks.id",
+    results: 100,
+    sort: "released",
+    reverse: true
+  };
+  const cacheKey = JSON.stringify(requestPayload);
+  const cachedPayload = readFromCache(releaseQueryCache, cacheKey);
+  if (cachedPayload) {
+    return cachedPayload as VisualNovelExternalLinkEntry[];
+  }
+
+  const networkResponse = await fetch(targetApiEndpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(requestPayload)
+  });
+
+  if (!networkResponse.ok) {
+    throw new Error(`Network boundary failure: Unable to retrieve visual novel store links (HTTP ${networkResponse.status}).`);
+  }
+
+  const responsePayload = await networkResponse.json() as {
+    results?: Array<Record<string, unknown>>;
+  };
+  const ALLOWED_STORE_NAMES = ['steam', 'jast usa', 'jast', 'gog', 'mangagamer'];
+
+  const normalizedStoreLinks: VisualNovelExternalLinkEntry[] = [];
+  const dedupeKeySet = new Set<string>();
+  const releaseEntries = Array.isArray(responsePayload.results) ? responsePayload.results : [];
+  releaseEntries.forEach((releaseEntry) => {
+    if (!releaseEntry || typeof releaseEntry !== 'object') {
+      return;
+    }
+
+    const releaseIdentifier = typeof releaseEntry.id === 'string'
+      ? releaseEntry.id
+      : typeof releaseEntry.id === 'number'
+        ? `r${releaseEntry.id}`
+        : undefined;
+    const releaseTitle = typeof releaseEntry.title === 'string' && releaseEntry.title.trim() !== ''
+      ? releaseEntry.title
+      : undefined;
+    const externalLinks = Array.isArray((releaseEntry as { extlinks?: unknown }).extlinks)
+      ? (releaseEntry as { extlinks: unknown[] }).extlinks
+      : [];
+
+    externalLinks.forEach((externalLinkEntry) => {
+      if (!externalLinkEntry || typeof externalLinkEntry !== 'object') {
+        return;
+      }
+
+      const rawExternalLink = externalLinkEntry as Record<string, unknown>;
+      const externalUrl = typeof rawExternalLink.url === 'string' ? rawExternalLink.url.trim() : '';
+      if (externalUrl === '') {
+        return;
+      }
+
+      const externalLabel = typeof rawExternalLink.label === 'string' && rawExternalLink.label.trim() !== ''
+        ? rawExternalLink.label.trim()
+        : typeof rawExternalLink.name === 'string' && rawExternalLink.name.trim() !== ''
+          ? rawExternalLink.name.trim()
+          : 'External Link';
+      const externalSource = typeof rawExternalLink.name === 'string' && rawExternalLink.name.trim() !== ''
+        ? rawExternalLink.name.trim()
+        : undefined;
+      const normalizedSourceName = (externalSource ?? '').toLowerCase();
+      const normalizedLabelName = externalLabel.toLowerCase();
+      const isAllowedStoreLink = ALLOWED_STORE_NAMES.some((allowedStoreName) => (
+        normalizedSourceName.includes(allowedStoreName) || normalizedLabelName.includes(allowedStoreName)
+      ));
+      if (!isAllowedStoreLink) {
+        return;
+      }
+      const dedupeKey = `${externalUrl.toLowerCase()}|${externalLabel.toLowerCase()}`;
+      if (dedupeKeySet.has(dedupeKey)) {
+        return;
+      }
+
+      dedupeKeySet.add(dedupeKey);
+      normalizedStoreLinks.push({
+        url: externalUrl,
+        label: externalLabel,
+        source: externalSource,
+        releaseId: releaseIdentifier,
+        releaseTitle
+      });
+    });
+  });
+
+  writeToCache(releaseQueryCache, cacheKey, normalizedStoreLinks);
+  return normalizedStoreLinks;
 }
 
 export async function fetchVisualNovelDetailsById(visualNovelIdentifier: string) {
