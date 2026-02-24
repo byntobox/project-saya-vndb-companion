@@ -74,6 +74,7 @@ export function VisualNovelList({
   const loadingSkeletonIdentifiers = Array.from({ length: 12 }, (_, skeletonIndex) => `skeleton-${skeletonIndex}`);
   const FILTER_STORAGE_KEY = 'vndb_client_list_filters_v1';
   const SORT_STORAGE_KEY = 'vndb_client_list_sort_v1';
+  const RECENT_SEARCHES_STORAGE_KEY = 'vndb_client_recent_searches_v1';
   const LANGUAGE_OPTIONS = [
     { code: 'en', label: 'English' },
     { code: 'ja', label: 'Japanese' },
@@ -176,6 +177,26 @@ export function VisualNovelList({
   const [userListIdentifierSet, setUserListIdentifierSet] = useState<Set<string>>(new Set());
   const [userListStatusByIdentifier, setUserListStatusByIdentifier] = useState<Record<string, number>>({});
   const previousHomeNavigationRequestTokenReference = useRef<number>(homeNavigationRequestToken);
+  const hasLiveSearchEffectInitializedReference = useRef<boolean>(false);
+  const [recentSearchTerms, setRecentSearchTerms] = useState<string[]>(() => {
+    try {
+      const storedRecentSearchTerms = window.localStorage.getItem(RECENT_SEARCHES_STORAGE_KEY);
+      if (!storedRecentSearchTerms) {
+        return [];
+      }
+
+      const parsedSearchTerms = JSON.parse(storedRecentSearchTerms) as unknown;
+      if (!Array.isArray(parsedSearchTerms)) {
+        return [];
+      }
+
+      return parsedSearchTerms
+        .filter((searchTerm): searchTerm is string => typeof searchTerm === 'string' && searchTerm.trim() !== '')
+        .slice(0, 8);
+    } catch {
+      return [];
+    }
+  });
 
   function normalizeEntryIdentifier(rawIdentifier: unknown): string | null {
     if (typeof rawIdentifier === 'string' && rawIdentifier.trim() !== '') {
@@ -339,6 +360,21 @@ export function VisualNovelList({
     executeDataFetchOperation({ kind: 'text', term: searchTerm, filters, sort: appliedSort }, 1, false);
   }
 
+  function registerRecentSearchTerm(searchTerm: string) {
+    const normalizedSearchTerm = searchTerm.trim();
+    if (normalizedSearchTerm === '') {
+      return;
+    }
+
+    setRecentSearchTerms((currentSearchTerms) => {
+      const deduplicatedSearchTerms = [
+        normalizedSearchTerm,
+        ...currentSearchTerms.filter((existingSearchTerm) => existingSearchTerm.toLowerCase() !== normalizedSearchTerm.toLowerCase())
+      ].slice(0, 8);
+      return deduplicatedSearchTerms;
+    });
+  }
+
   function executeSearchWithCurrentQuery(overrides: Partial<ListQueryDescriptor> = {}) {
     executeDataFetchOperation(
       {
@@ -438,6 +474,10 @@ export function VisualNovelList({
   }, [appliedSort]);
 
   useEffect(() => {
+    window.localStorage.setItem(RECENT_SEARCHES_STORAGE_KEY, JSON.stringify(recentSearchTerms));
+  }, [recentSearchTerms]);
+
+  useEffect(() => {
     // Initial bootstrap search for default list content.
     if (tagSearchRequest) {
       return;
@@ -445,6 +485,30 @@ export function VisualNovelList({
 
     executeDataFetchOperation({ kind: 'text', term: '', filters: initialFilterState, sort: initialSortState }, 1, false);
   }, []);
+
+  useEffect(() => {
+    if (!hasLiveSearchEffectInitializedReference.current) {
+      hasLiveSearchEffectInitializedReference.current = true;
+      return;
+    }
+
+    if (isViewingUserList || tagSearchRequest || developerSearchRequest) {
+      return;
+    }
+
+    const debounceTimeoutIdentifier = window.setTimeout(() => {
+      setUserListStatusByIdentifier({});
+      executeDataFetchOperation(
+        { kind: 'text', term: activeSearchTerm, filters: appliedFilters, sort: appliedSort },
+        1,
+        false
+      );
+    }, 350);
+
+    return () => {
+      window.clearTimeout(debounceTimeoutIdentifier);
+    };
+  }, [activeSearchTerm, appliedFilters, appliedSort, isViewingUserList, tagSearchRequest, developerSearchRequest]);
 
   async function executeDataFetchOperation(queryDescriptor: ListQueryDescriptor, pageNumber: number, shouldAppendResults: boolean) {
     if (shouldAppendResults) {
@@ -630,6 +694,7 @@ export function VisualNovelList({
     formEvent.preventDefault();
     setIsViewingUserList(false);
     setUserListStatusByIdentifier({});
+    registerRecentSearchTerm(activeSearchTerm);
     executeSearchWithFilters(activeSearchTerm, appliedFilters);
   }
 
@@ -785,6 +850,33 @@ export function VisualNovelList({
         />
         <button type="submit" className={styles.searchExecutionButton} style={themedPrimaryButtonStyle}>Search</button>
       </form>
+      {recentSearchTerms.length > 0 && (
+        <div className={styles.recentSearchRow}>
+          <span className={styles.recentSearchLabel}>Recent:</span>
+          {recentSearchTerms.map((recentSearchTerm) => (
+            <button
+              key={recentSearchTerm}
+              type="button"
+              className={styles.recentSearchChip}
+              onClick={() => {
+                setActiveSearchTerm(recentSearchTerm);
+                setIsViewingUserList(false);
+                setUserListStatusByIdentifier({});
+                executeSearchWithFilters(recentSearchTerm, appliedFilters);
+              }}
+            >
+              {recentSearchTerm}
+            </button>
+          ))}
+          <button
+            type="button"
+            className={styles.recentSearchClearButton}
+            onClick={() => setRecentSearchTerms([])}
+          >
+            Clear
+          </button>
+        </div>
+      )}
       <div className={styles.filterControlRow}>
         {authenticatedSession && (
           <button
@@ -943,6 +1035,21 @@ export function VisualNovelList({
           )}
           {isViewingUserList && visualNovelDatabaseEntries.length === 0 && (
             <div className={styles.systemStatusMessage}>Your VN list is currently empty or unavailable.</div>
+          )}
+          {!isViewingUserList && visualNovelDatabaseEntries.length === 0 && (
+            <div className={styles.emptyStateBoundary}>
+              <p className={styles.emptyStateTitle}>No visual novels found.</p>
+              <p className={styles.emptyStateBody}>Try a broader title, remove filters, or clear the search term.</p>
+              {activeSearchTerm.trim() !== '' && (
+                <button
+                  type="button"
+                  className={styles.filterSecondaryButton}
+                  onClick={() => setActiveSearchTerm('')}
+                >
+                  Clear Search
+                </button>
+              )}
+            </div>
           )}
           <ul className={styles.visualNovelResultsList}>
             {/* The parent component now strictly maps data to the child interface. */}
