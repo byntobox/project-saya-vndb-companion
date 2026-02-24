@@ -21,6 +21,7 @@ const tagQueryCache = new Map<string, { expiresAt: number; payload: unknown }>()
 const characterQueryCache = new Map<string, { expiresAt: number; payload: unknown }>();
 const traitQueryCache = new Map<string, { expiresAt: number; payload: unknown }>();
 const userListQueryCache = new Map<string, { expiresAt: number; payload: unknown }>();
+const statsQueryCache = new Map<string, { expiresAt: number; payload: unknown }>();
 
 function buildVndbApiUrl(endpointPath: string) {
   return `${VNDB_API_BASE_URL}${endpointPath}`;
@@ -107,6 +108,52 @@ export async function fetchAuthenticationInfoByToken(authenticationToken: string
   }
 
   return networkResponse.json();
+}
+
+export async function fetchDatabaseStatistics() {
+  const targetApiEndpoint = buildVndbApiUrl('/stats');
+  const cacheKey = 'global_database_stats';
+  const cachedPayload = readFromCache(statsQueryCache, cacheKey);
+  if (cachedPayload) {
+    return cachedPayload as {
+      visualNovels: number;
+      tags: number;
+      releases: number;
+      producers: number;
+      staff: number;
+      characters: number;
+      traits: number;
+    };
+  }
+
+  const networkResponse = await fetch(targetApiEndpoint, {
+    method: 'GET'
+  });
+
+  if (!networkResponse.ok) {
+    throw new Error(`Network boundary failure: Unable to retrieve VNDB statistics (HTTP ${networkResponse.status}).`);
+  }
+
+  const responsePayload = await networkResponse.json() as Record<string, unknown>;
+  function readNumericStatValue(...candidateKeys: string[]) {
+    const matchingCandidate = candidateKeys.find((candidateKey) => (
+      typeof responsePayload[candidateKey] === 'number' && Number.isFinite(responsePayload[candidateKey] as number)
+    ));
+    return matchingCandidate ? Number(responsePayload[matchingCandidate]) : 0;
+  }
+
+  const normalizedStatistics = {
+    visualNovels: readNumericStatValue('vn', 'vns', 'visual_novels', 'visualNovels'),
+    tags: readNumericStatValue('tags', 'tag'),
+    releases: readNumericStatValue('releases', 'release'),
+    producers: readNumericStatValue('producers', 'producer'),
+    staff: readNumericStatValue('staff'),
+    characters: readNumericStatValue('chars', 'characters', 'character'),
+    traits: readNumericStatValue('traits', 'trait')
+  };
+
+  writeToCache(statsQueryCache, cacheKey, normalizedStatistics);
+  return normalizedStatistics;
 }
 
 // Append this function to src/api/visualNovelClient.ts
