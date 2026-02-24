@@ -3,6 +3,7 @@ import { VisualNovelList } from './components/VisualNovelList';
 import { VisualNovelDetailView } from './components/VisualNovelDetailView';
 import {
   addVisualNovelToAuthenticatedUserList,
+  fetchDatabaseStatistics,
   fetchAuthenticationInfoByToken,
   prefetchVisualNovelCoreDetailsById,
   updateAuthenticatedUserVisualNovelStatusLabel
@@ -25,6 +26,16 @@ interface AuthenticatedSession {
   userId: string;
   username: string;
   permissions: string[];
+}
+
+interface DatabaseStatistics {
+  visualNovels: number;
+  tags: number;
+  releases: number;
+  producers: number;
+  staff: number;
+  characters: number;
+  traits: number;
 }
 
 type ThemeIdentifier = 'midnight' | 'aurora' | 'sunset' | 'light' | 'crimson';
@@ -98,6 +109,9 @@ export default function RootApplication() {
   const [activeThemeIdentifier, setActiveThemeIdentifier] = useState<ThemeIdentifier>('midnight');
   const [userListRefreshToken, setUserListRefreshToken] = useState<number>(0);
   const [homeNavigationRequestToken, setHomeNavigationRequestToken] = useState<number>(0);
+  const [databaseStatistics, setDatabaseStatistics] = useState<DatabaseStatistics | null>(null);
+  const [isDatabaseStatisticsLoading, setIsDatabaseStatisticsLoading] = useState<boolean>(false);
+  const [databaseStatisticsErrorMessage, setDatabaseStatisticsErrorMessage] = useState<string | null>(null);
 
   function completeOnboarding() {
     window.localStorage.setItem(ONBOARDING_COMPLETED_STORAGE_KEY, 'true');
@@ -189,6 +203,39 @@ export default function RootApplication() {
     document.documentElement.setAttribute('data-theme', activeThemeIdentifier);
     window.localStorage.setItem(THEME_STORAGE_KEY, activeThemeIdentifier);
   }, [activeThemeIdentifier]);
+
+  useEffect(() => {
+    if (!isMenuPanelVisible || databaseStatistics) {
+      return;
+    }
+
+    let hasLifecycleBeenCancelled = false;
+    setIsDatabaseStatisticsLoading(true);
+    setDatabaseStatisticsErrorMessage(null);
+
+    fetchDatabaseStatistics()
+      .then((statisticsPayload) => {
+        if (!hasLifecycleBeenCancelled) {
+          setDatabaseStatistics(statisticsPayload);
+        }
+      })
+      .catch((caughtError) => {
+        if (!hasLifecycleBeenCancelled) {
+          setDatabaseStatisticsErrorMessage(
+            caughtError instanceof Error ? caughtError.message : 'Unable to retrieve VNDB statistics.'
+          );
+        }
+      })
+      .finally(() => {
+        if (!hasLifecycleBeenCancelled) {
+          setIsDatabaseStatisticsLoading(false);
+        }
+      });
+
+    return () => {
+      hasLifecycleBeenCancelled = true;
+    };
+  }, [isMenuPanelVisible, databaseStatistics]);
 
   // Detect coarse-pointer/mobile vs desktop and current orientation for responsive layout tuning.
   useEffect(() => {
@@ -408,6 +455,23 @@ export default function RootApplication() {
         </div>
 
         <p className="menu-drawer-note">VNDB API v2 uses API tokens for authentication.</p>
+
+        <section className="menu-stats-panel">
+          <h3 className="menu-stats-title">VNDB Database Stats</h3>
+          {isDatabaseStatisticsLoading && <p className="menu-stats-status">Loading statistics...</p>}
+          {databaseStatisticsErrorMessage && <p className="menu-stats-error">{databaseStatisticsErrorMessage}</p>}
+          {databaseStatistics && (
+            <ul className="menu-stats-list">
+              <li><span>Visual novels</span><strong>{databaseStatistics.visualNovels.toLocaleString()}</strong></li>
+              <li><span>Tags</span><strong>{databaseStatistics.tags.toLocaleString()}</strong></li>
+              <li><span>Releases</span><strong>{databaseStatistics.releases.toLocaleString()}</strong></li>
+              <li><span>Producers</span><strong>{databaseStatistics.producers.toLocaleString()}</strong></li>
+              <li><span>Staff</span><strong>{databaseStatistics.staff.toLocaleString()}</strong></li>
+              <li><span>Characters</span><strong>{databaseStatistics.characters.toLocaleString()}</strong></li>
+              <li><span>Traits</span><strong>{databaseStatistics.traits.toLocaleString()}</strong></li>
+            </ul>
+          )}
+        </section>
 
         {authenticatedSession ? (
           <div className="menu-auth-block">
