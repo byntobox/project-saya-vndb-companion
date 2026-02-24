@@ -1,73 +1,111 @@
-# React + TypeScript + Vite
+# Project Saya VNDB Companion
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Web client for browsing VNDB, viewing detailed VN pages, and managing a personal VN list with API token auth.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- React + TypeScript
+- Vite
+- Vite PWA plugin
+- VNDB API v2 (Kana)
 
-## React Compiler
+## Core Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Search and infinite-scroll VN list browsing
+- Detailed VN view:
+  - full cover image
+  - release + rating
+  - formatted description rendering
+  - related titles with navigation
+  - developer chips with search navigation
+  - tags with spoiler/category filtering
+  - screenshots gallery + lightbox viewer
+- VNDB token onboarding/login (with skip option)
+- Personal VN list support:
+  - load user list
+  - add VN to list
+  - update label/status (playing, finished, stalled, dropped, wishlist, blacklist)
+  - remove from list
+- Persistent filter/sort settings
+- Theming system (multiple color themes)
+- Responsive layouts tuned for:
+  - desktop landscape
+  - mobile portrait
+  - mobile landscape
 
-## Expanding the ESLint configuration
+## VNDB Token Permissions
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+For full functionality, the token should include:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- `listread`
+- `listwrite`
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Without these, personal-list features are limited.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Local Development
+
+Install dependencies:
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Run dev server:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
 ```
+
+Build:
+
+```bash
+npm run build
+```
+
+## Local HTTPS (mkcert)
+
+This project supports local HTTPS automatically when mkcert files exist in the project root.
+
+Generate certs:
+
+```bash
+brew install mkcert nss
+mkcert -install
+cd /Users/byntobox/vndb-client
+mkcert localhost 127.0.0.1 ::1
+```
+
+Then run:
+
+```bash
+npm run dev
+```
+
+Vite will serve HTTPS if it finds:
+
+- `localhost+N.pem`
+- `localhost+N-key.pem`
+
+These files are ignored by git.
+
+## API Notes
+
+- In development, API requests use Vite proxy path `/api/vndb` (configured in `vite.config.ts`) to avoid browser CORS issues on write endpoints.
+- In production, requests go directly to `https://api.vndb.org/kana`.
+
+If production CORS issues appear for authenticated writes, add a backend proxy (Lambda/API Gateway, etc.) and route production API calls through it.
+
+## Deployment (AWS Recommended Path)
+
+Recommended: AWS Amplify Hosting for this frontend.
+
+Basic flow:
+
+1. Connect GitHub repo to Amplify
+2. Use build command: `npm run build`
+3. Publish directory: `dist`
+4. Deploy branch (e.g., `main`)
+
+## Repository
+
+- GitHub: https://github.com/byntobox/project-saya-vndb-companion
