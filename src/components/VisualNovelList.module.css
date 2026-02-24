@@ -1,0 +1,1120 @@
+/* src/components/VisualNovelList.module.css */
+
+.interfaceContainerBoundary {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 24px 18px 30px;
+  color: var(--text-primary);
+  animation: viewEnter 360ms cubic-bezier(0.2, 0.72, 0.26, 1);
+}
+
+.listHeaderBlock {
+  margin-bottom: 18px;
+}
+
+.listHeadingText {
+  margin: 0;
+  font-size: clamp(1.3rem, 2.4vw, 1.8rem);
+  letter-spacing: 0.01em;
+}
+
+.listSubheadingText {
+  margin: 6px 0 0;
+  color: var(--text-secondary);
+  font-size: 0.94rem;
+}
+
+.resultSummaryText {
+  margin: 0 0 14px;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+}
+
+.userListInfoText {
+  margin: -6px 0 14px;
+  color: #9fb3d8;
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.filterControlRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 12px;
+}
+
+.sortControlGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sortLabelText {
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.sortSelectField {
+  padding: 7px 9px;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: rgba(8, 14, 32, 0.62);
+  color: var(--text-primary);
+  font-size: 0.78rem;
+}
+
+.sortDirectionButton {
+  padding: 7px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--button-secondary-border);
+  background: var(--button-secondary-bg);
+  color: var(--button-secondary-text);
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.sortDirectionButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.filterToggleButton {
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--button-secondary-text);
+  background: var(--button-secondary-bg);
+  border: 1px solid var(--button-secondary-border);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.userListToggleButton {
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--button-secondary-text);
+  background: var(--button-secondary-bg);
+  border: 1px solid var(--button-secondary-border);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.activeFilterText {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.filterPanelBoundary {
+  margin: 0 0 16px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-elevated);
+  display: grid;
+  gap: 12px;
+}
+
+.filterSectionBoundary {
+  display: grid;
+  gap: 8px;
+}
+
+.filterSectionTitle {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #dce6ff;
+}
+
+.filterChipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filterChipButton {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(127, 153, 214, 0.34);
+  background: rgba(21, 33, 61, 0.52);
+  color: #c6d6f8;
+  font-size: 0.76rem;
+  cursor: pointer;
+}
+
+.filterChipButtonSelected {
+  background: rgba(63, 103, 194, 0.45);
+  border-color: rgba(141, 180, 255, 0.72);
+  color: #f0f5ff;
+}
+
+.filterSelectField {
+  width: 100%;
+  padding: 10px 11px;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: rgba(8, 14, 32, 0.62);
+  color: var(--text-primary);
+}
+
+.filterToggleGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.filterCheckboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.79rem;
+  color: #d6e1fa;
+}
+
+.filterActionRow {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.filterSecondaryButton {
+  padding: 9px 13px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--button-tertiary-text);
+  background: var(--button-tertiary-bg);
+  border: 1px solid var(--button-tertiary-border);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.searchControlBoundary {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-elevated);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.searchInputField {
+  flex-grow: 1;
+  padding: 12px 14px;
+  font-size: 0.96rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  background: rgba(8, 14, 32, 0.6);
+  color: var(--text-primary);
+}
+
+.searchInputField::placeholder {
+  color: var(--text-secondary);
+}
+
+.searchExecutionButton {
+  padding: 11px 18px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--button-primary-text);
+  background: var(--button-primary-bg);
+  border: 1px solid var(--button-primary-border);
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: var(--button-primary-shadow);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.searchExecutionButton:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--button-primary-shadow-hover);
+}
+
+.systemStatusMessage {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 18px;
+  font-size: 0.92rem;
+}
+
+.systemErrorMessage {
+  text-align: center;
+  color: #ffb9c5;
+  background-color: rgba(108, 24, 44, 0.5);
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 120, 148, 0.28);
+}
+
+.visualNovelResultsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+  gap: 16px;
+}
+
+.visualNovelListItem {
+  --stagger-index: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: 14px;
+  background: none;
+  cursor: pointer;
+  transform-origin: center;
+  animation: cardEnter 460ms cubic-bezier(0.19, 0.78, 0.25, 1) both;
+  animation-delay: calc(var(--stagger-index) * 20ms);
+  transition: transform 190ms ease, filter 190ms ease;
+}
+
+.visualNovelListItem:hover {
+  transform: translateY(-4px) scale(1.014);
+  filter: saturate(1.08);
+}
+
+.coverImageBoundary {
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  background: linear-gradient(165deg, rgba(67, 75, 103, 0.8), rgba(39, 44, 66, 0.9));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.coverImageElement {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.01);
+}
+
+.explicitContentBlur {
+  filter: blur(10px);
+}
+
+.placeholderText {
+  font-size: 0.78rem;
+  color: #b9c0d7;
+  padding: 10px;
+  text-align: center;
+}
+
+.textDetailsBoundary {
+  display: none;
+}
+
+.novelTitleText {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+  line-height: 1.28;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.92);
+}
+
+.novelRatingText {
+  font-size: 0.72rem;
+  color: #eceff7;
+  margin: 4px 0 0;
+  text-shadow: 0 1px 7px rgba(0, 0, 0, 0.9);
+}
+
+.imageContainerWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(208, 219, 255, 0.18);
+  box-shadow: 0 18px 26px rgba(2, 6, 22, 0.42);
+}
+
+.explicitContentOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.48);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  z-index: 10;
+}
+
+.revealContentButton {
+  background-color: rgba(7, 12, 22, 0.72);
+  color: #edf1ff;
+  border: 1px solid rgba(218, 228, 255, 0.85);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.cardTextOverlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  padding: 28px 10px 10px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.6) 52%, rgba(0, 0, 0, 0) 100%);
+}
+
+.quickAddRow {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.quickAddSelectField {
+  max-width: 110px;
+  padding: 4px 7px;
+  border-radius: 9px;
+  border: 1px solid rgba(151, 182, 242, 0.64);
+  background: rgba(8, 16, 34, 0.9);
+  color: #e5efff;
+  font-size: 0.66rem;
+}
+
+.quickAddButton {
+  border: 1px solid rgba(152, 183, 244, 0.7);
+  background: rgba(8, 16, 34, 0.85);
+  color: #e8f1ff;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.quickAddButtonAdded {
+  border-color: rgba(106, 218, 164, 0.84);
+  background: rgba(26, 106, 75, 0.86);
+  color: #d9ffef;
+  cursor: default;
+}
+
+.quickAddButton:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.quickAddButtonAdded:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.quickAddMessage {
+  max-width: 120px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(4, 10, 24, 0.84);
+  border: 1px solid rgba(145, 173, 235, 0.38);
+  color: #d9e6ff;
+  font-size: 0.62rem;
+  text-align: right;
+}
+
+.detailContentCentered {
+  text-align: center;
+}
+
+.backToSearchButton {
+  margin-bottom: 16px;
+}
+
+.floatingBackButton {
+  position: fixed;
+  left: max(22px, calc(env(safe-area-inset-left) + 18px));
+  bottom: max(26px, calc(env(safe-area-inset-bottom) + 20px));
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 178, 239, 0.42);
+  background: linear-gradient(135deg, rgba(26, 42, 76, 0.9), rgba(20, 31, 55, 0.9));
+  color: #e8efff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 60;
+  box-shadow: 0 12px 24px rgba(1, 7, 24, 0.54);
+  transition: transform 170ms ease, filter 170ms ease;
+}
+
+.floatingBackButton:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.detailTitleText {
+  margin: 0;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  letter-spacing: 0.02em;
+}
+
+.detailCoverSection {
+  margin: 14px 0 20px;
+}
+
+.detailHeroLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+}
+
+.detailHeroInfo {
+  width: 100%;
+  max-width: 760px;
+}
+
+.detailCoverImage {
+  width: 100%;
+  max-width: 340px;
+  border-radius: 14px;
+  border: 1px solid rgba(214, 225, 255, 0.24);
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 0 24px 34px rgba(2, 7, 26, 0.52);
+}
+
+.detailNoImagePlaceholder {
+  width: 100%;
+  max-width: 340px;
+  min-height: 190px;
+  border-radius: 14px;
+  border: 1px solid rgba(214, 225, 255, 0.18);
+  background: rgba(19, 26, 46, 0.7);
+  color: #aeb8d4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 12px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.detailMetaRow {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.detailActionRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 8px 0 2px;
+}
+
+.detailActionStateChip {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(126, 173, 255, 0.52);
+  background: rgba(37, 75, 145, 0.34);
+  color: #dbe8ff;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.detailActionStateChipAdded {
+  border-color: rgba(110, 224, 168, 0.78);
+  background: rgba(34, 117, 86, 0.46);
+  color: #d7ffe9;
+}
+
+.detailStatusSelectField {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: rgba(8, 14, 32, 0.62);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+}
+
+.detailActionMessage {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #c9dbff;
+}
+
+.detailMetaChip {
+  min-width: 132px;
+  padding: 9px 12px;
+  border-radius: 11px;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-elevated);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.detailMetaLabel {
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.detailDescriptionSection,
+.detailTagSection,
+.detailScreenshotSection,
+.detailRelatedSection,
+.detailContributorSection {
+  margin: 18px auto 0;
+  max-width: 760px;
+  border-radius: 14px;
+  padding: 14px;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-elevated);
+}
+
+.contributorGroupBoundary {
+  margin-top: 10px;
+  text-align: left;
+}
+
+.contributorGroupTitle {
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #cfdcff;
+}
+
+.contributorChipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.contributorChipButton {
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(120, 167, 255, 0.48);
+  background: rgba(52, 93, 173, 0.34);
+  color: #dbe9ff;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.relatedVisualNovelList {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.relatedVisualNovelListItem {
+  margin: 0;
+}
+
+.relatedVisualNovelButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  padding: 9px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(121, 164, 248, 0.33);
+  background: rgba(25, 37, 66, 0.68);
+  color: #e4ecff;
+  cursor: pointer;
+}
+
+.relatedVisualNovelRelationBadge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(59, 95, 172, 0.42);
+  border: 1px solid rgba(141, 180, 255, 0.46);
+  color: #dce8ff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.relatedVisualNovelTitleText {
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.sectionHeadingText {
+  margin: 0 0 10px;
+  text-align: left;
+  font-size: 1rem;
+}
+
+.detailDescriptionText {
+  white-space: pre-wrap;
+  text-align: left;
+  color: var(--text-primary);
+  line-height: 1.66;
+}
+
+.detailDescriptionText a {
+  color: #65a9ff;
+  text-decoration: underline;
+}
+
+.detailTagToggleButton {
+  padding: 9px 14px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--button-secondary-text);
+  background: var(--button-secondary-bg);
+  border: 1px solid var(--button-secondary-border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 170ms ease, filter 170ms ease;
+}
+
+.detailTagToggleButton:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.detailTagList {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  animation: expandIn 220ms ease;
+}
+
+.tagVisibilityControlRow {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tagControlLabel {
+  color: #dce7ff;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.tagSpoilerSelectField {
+  padding: 7px 9px;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: rgba(8, 14, 32, 0.62);
+  color: var(--text-primary);
+  font-size: 0.78rem;
+}
+
+.tagCategoryFilterRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.tagCategoryFilterButton {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(120, 153, 214, 0.42);
+  background: rgba(19, 30, 53, 0.66);
+  color: #cbd9f8;
+  font-size: 0.74rem;
+  cursor: pointer;
+}
+
+.tagCategoryFilterButtonActive {
+  background: rgba(54, 92, 171, 0.48);
+  border-color: rgba(146, 183, 255, 0.72);
+  color: #ecf3ff;
+}
+
+.detailTagPill {
+  background-color: rgba(56, 95, 171, 0.33);
+  border: 1px solid rgba(121, 164, 248, 0.46);
+  color: #dce8ff;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  padding: 4px 10px;
+}
+
+.detailTagPillButton {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: flex-start;
+  background-color: rgba(56, 95, 171, 0.33);
+  border: 1px solid rgba(121, 164, 248, 0.46);
+  color: #dce8ff;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: filter 140ms ease;
+}
+
+.detailTagPillButton:hover {
+  filter: brightness(1.15);
+}
+
+.detailTagPillContent {
+  background-color: rgba(54, 96, 176, 0.42);
+  border-color: rgba(125, 170, 255, 0.58);
+  color: #e5efff;
+}
+
+.detailTagPillSexual {
+  background-color: rgba(160, 46, 85, 0.42);
+  border-color: rgba(236, 121, 160, 0.56);
+  color: #ffe4ef;
+}
+
+.detailTagPillTechnical {
+  background-color: rgba(47, 140, 123, 0.4);
+  border-color: rgba(111, 223, 200, 0.58);
+  color: #dffef6;
+}
+
+.detailTagPillOther {
+  background-color: rgba(92, 102, 122, 0.4);
+  border-color: rgba(163, 174, 200, 0.5);
+  color: #e6ebfb;
+}
+
+.tagMetaText {
+  font-size: 0.66rem;
+  color: #b8c9ef;
+}
+
+.detailScreenshotGrid {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+  animation: expandIn 220ms ease;
+}
+
+.detailScreenshotItem {
+  margin: 0;
+}
+
+.detailScreenshotButton {
+  display: block;
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  cursor: zoom-in;
+}
+
+.detailScreenshotImage {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid rgba(208, 218, 255, 0.25);
+  display: block;
+  transition: transform 180ms ease;
+}
+
+.detailScreenshotImage:hover {
+  transform: scale(1.02);
+}
+
+.screenshotLightboxOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 7, 20, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 120;
+  padding: 16px;
+}
+
+.screenshotLightboxContent {
+  position: relative;
+  max-width: min(1200px, 94vw);
+  max-height: min(92vh, 860px);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.screenshotLightboxImage {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 12px;
+  border: 1px solid rgba(203, 221, 255, 0.24);
+  box-shadow: 0 22px 44px rgba(0, 0, 0, 0.42);
+}
+
+.screenshotLightboxControlButton {
+  position: absolute;
+  border: 1px solid rgba(153, 184, 244, 0.5);
+  background: rgba(10, 20, 42, 0.78);
+  color: #eff5ff;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.screenshotLightboxCloseButton {
+  top: 10px;
+  right: 10px;
+  padding: 7px 12px;
+  font-size: 0.74rem;
+}
+
+.screenshotLightboxPreviousButton,
+.screenshotLightboxNextButton {
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  font-size: 1.2rem;
+}
+
+.screenshotLightboxPreviousButton {
+  left: 10px;
+}
+
+.screenshotLightboxNextButton {
+  right: 10px;
+}
+
+.screenshotLightboxCounter {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(8, 16, 32, 0.72);
+  border: 1px solid rgba(153, 184, 244, 0.36);
+  color: #dde9ff;
+  font-size: 0.74rem;
+}
+
+@keyframes viewEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes expandIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 760px) {
+  .interfaceContainerBoundary {
+    padding: 18px 14px 22px;
+  }
+
+  .visualNovelResultsList {
+    grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+    gap: 12px;
+  }
+
+  .searchControlBoundary {
+    flex-direction: column;
+  }
+
+  .searchExecutionButton {
+    width: 100%;
+  }
+
+  .filterControlRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filterToggleGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .filterActionRow {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .filterSecondaryButton,
+  .filterActionRow .searchExecutionButton {
+    flex: 1;
+  }
+
+  .detailDescriptionSection,
+  .detailTagSection,
+  .detailScreenshotSection {
+    padding: 12px;
+  }
+
+  .floatingBackButton {
+    left: max(18px, calc(env(safe-area-inset-left) + 14px));
+    bottom: max(22px, calc(env(safe-area-inset-bottom) + 16px));
+  }
+}
+
+/* Desktop landscape: expand list density and present detail hero in two columns. */
+:global(html[data-device='desktop'][data-orientation='landscape']) .interfaceContainerBoundary {
+  max-width: 1320px;
+}
+
+:global(html[data-device='desktop'][data-orientation='landscape']) .visualNovelResultsList {
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 18px;
+}
+
+:global(html[data-device='desktop'][data-orientation='landscape']) .detailHeroLayout {
+  grid-template-columns: minmax(280px, 360px) minmax(380px, 1fr);
+  justify-content: center;
+  align-items: start;
+  gap: 18px;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+:global(html[data-device='desktop'][data-orientation='landscape']) .detailCoverSection {
+  margin: 8px 0 0;
+}
+
+:global(html[data-device='desktop'][data-orientation='landscape']) .detailHeroInfo {
+  max-width: 100%;
+}
+
+:global(html[data-device='desktop'][data-orientation='landscape']) .detailMetaRow,
+:global(html[data-device='desktop'][data-orientation='landscape']) .detailActionRow {
+  justify-content: flex-start;
+}
+
+:global(html[data-device='desktop'][data-orientation='landscape']) .detailDescriptionSection,
+:global(html[data-device='desktop'][data-orientation='landscape']) .detailTagSection,
+:global(html[data-device='desktop'][data-orientation='landscape']) .detailScreenshotSection,
+:global(html[data-device='desktop'][data-orientation='landscape']) .detailRelatedSection,
+:global(html[data-device='desktop'][data-orientation='landscape']) .detailContributorSection {
+  max-width: 980px;
+}
+
+/* Mobile landscape: tighten spacing and split detail hero for better horizontal use. */
+:global(html[data-device='mobile'][data-orientation='landscape']) .interfaceContainerBoundary {
+  padding-top: 12px;
+}
+
+:global(html[data-device='mobile'][data-orientation='landscape']) .searchControlBoundary {
+  flex-direction: row;
+  align-items: center;
+}
+
+:global(html[data-device='mobile'][data-orientation='landscape']) .searchExecutionButton {
+  width: auto;
+}
+
+:global(html[data-device='mobile'][data-orientation='landscape']) .visualNovelResultsList {
+  grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+  gap: 10px;
+}
+
+:global(html[data-device='mobile'][data-orientation='landscape']) .detailHeroLayout {
+  grid-template-columns: minmax(150px, 190px) minmax(0, 1fr);
+  justify-content: center;
+  align-items: start;
+  gap: 12px;
+}
+
+:global(html[data-device='mobile'][data-orientation='landscape']) .detailCoverSection {
+  margin: 8px 0 0;
+}
+
+:global(html[data-device='mobile'][data-orientation='landscape']) .detailCoverImage,
+:global(html[data-device='mobile'][data-orientation='landscape']) .detailNoImagePlaceholder {
+  max-width: 190px;
+}
+
+:global(html[data-device='mobile'][data-orientation='landscape']) .detailMetaRow {
+  justify-content: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+:global(html[data-device='mobile'][data-orientation='landscape']) .detailActionRow {
+  justify-content: flex-start;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interfaceContainerBoundary,
+  .visualNovelListItem,
+  .detailTagList,
+  .detailScreenshotGrid,
+  .searchExecutionButton,
+  .detailTagToggleButton,
+  .detailScreenshotImage {
+    animation: none;
+    transition: none;
+  }
+}
