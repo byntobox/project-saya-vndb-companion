@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local HTTPS certs (mkcert)
+localhost+*.pem
+
+# Local HTTPS certs (mkcert)
+localhost+*.pem
