@@ -109,6 +109,7 @@ export default function RootApplication() {
   const [activeThemeIdentifier, setActiveThemeIdentifier] = useState<ThemeIdentifier>('midnight');
   const [userListRefreshToken, setUserListRefreshToken] = useState<number>(0);
   const [homeNavigationRequestToken, setHomeNavigationRequestToken] = useState<number>(0);
+  const [isLogoutConfirmationVisible, setIsLogoutConfirmationVisible] = useState<boolean>(false);
   const [databaseStatistics, setDatabaseStatistics] = useState<DatabaseStatistics | null>(null);
   const [isDatabaseStatisticsLoading, setIsDatabaseStatisticsLoading] = useState<boolean>(false);
   const [databaseStatisticsErrorMessage, setDatabaseStatisticsErrorMessage] = useState<string | null>(null);
@@ -330,10 +331,11 @@ export default function RootApplication() {
   }
 
   function handleLogout() {
-    const hasUserConfirmedLogout = window.confirm('Log out of your VNDB account?');
-    if (!hasUserConfirmedLogout) {
-      return;
-    }
+    setIsLogoutConfirmationVisible(true);
+  }
+
+  function handleConfirmLogout() {
+    setIsLogoutConfirmationVisible(false);
 
     setAuthenticatedSession(null);
     setAuthenticationErrorMessage(null);
@@ -343,6 +345,10 @@ export default function RootApplication() {
     window.localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
     window.localStorage.removeItem(ONBOARDING_COMPLETED_STORAGE_KEY);
     handleNavigateToListView();
+  }
+
+  function handleCancelLogout() {
+    setIsLogoutConfirmationVisible(false);
   }
 
   async function handleAddVisualNovelToUserList(visualNovelIdentifier: string, labelIdentifier = 5) {
@@ -536,6 +542,23 @@ export default function RootApplication() {
           </div>
         )}
       </section>
+
+      {isLogoutConfirmationVisible && (
+        <div className="modal-overlay-layer" onClick={handleCancelLogout}>
+          <section className="confirmation-modal-panel" onClick={(clickEvent) => clickEvent.stopPropagation()}>
+            <h3 className="confirmation-modal-title">Confirm Logout</h3>
+            <p className="confirmation-modal-text">Log out of your VNDB account and return to login?</p>
+            <div className="confirmation-modal-actions">
+              <button type="button" className="onboarding-skip-button" onClick={handleCancelLogout}>
+                Cancel
+              </button>
+              <button type="button" className="header-auth-button" onClick={handleConfirmLogout}>
+                Logout
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </main>
   );
 }

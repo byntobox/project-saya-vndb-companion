@@ -71,6 +71,7 @@ export function VisualNovelList({
     color: 'var(--button-primary-text)',
     boxShadow: 'var(--button-primary-shadow)'
   } as const;
+  const loadingSkeletonIdentifiers = Array.from({ length: 12 }, (_, skeletonIndex) => `skeleton-${skeletonIndex}`);
   const FILTER_STORAGE_KEY = 'vndb_client_list_filters_v1';
   const SORT_STORAGE_KEY = 'vndb_client_list_sort_v1';
   const LANGUAGE_OPTIONS = [
@@ -911,7 +912,18 @@ export function VisualNovelList({
         </div>
       )}
 
-      {isDataLoading && <div className={styles.systemStatusMessage}>Executing network request...</div>}
+      {isDataLoading && (
+        <>
+          <div className={styles.systemStatusMessage}>Executing network request...</div>
+          <ul className={styles.visualNovelResultsList} aria-hidden>
+            {loadingSkeletonIdentifiers.map((skeletonIdentifier) => (
+              <li key={skeletonIdentifier} className={styles.visualNovelListItemSkeleton}>
+                <div className={styles.visualNovelCardSkeleton} />
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
       {networkErrorMessage && <div className={styles.systemErrorMessage}>System Error: {networkErrorMessage}</div>}
 
       {!isDataLoading && !networkErrorMessage && (

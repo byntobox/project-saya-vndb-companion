@@ -472,6 +472,44 @@ html[data-device='desktop'][data-orientation='landscape'] .application-container
   font-size: 0.86rem;
 }
 
+.modal-overlay-layer {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 18, 0.62);
+  z-index: 140;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.confirmation-modal-panel {
+  width: min(420px, 100%);
+  border-radius: 14px;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface);
+  padding: 14px;
+  box-shadow: 0 16px 28px rgba(1, 7, 24, 0.46);
+}
+
+.confirmation-modal-title {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.confirmation-modal-text {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.confirmation-modal-actions {
+  margin-top: 14px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .view-pane {
   transition: opacity 220ms ease;
 }

@@ -584,7 +584,26 @@ export function VisualNovelDetailView({
   }, [activeScreenshotIndex, normalizedScreenshotEntries]);
 
   if (isDataLoading) {
-    return <div className={styles.systemStatusMessage}>Loading detailed system records...</div>;
+    return (
+      <div className={`${styles.interfaceContainerBoundary} ${styles.detailContentCentered}`}>
+        <div className={styles.detailSkeletonButton} />
+        <div className={styles.detailSkeletonTitle} />
+        <div className={styles.detailHeroLayout}>
+          <div className={styles.detailSkeletonCover} />
+          <div className={styles.detailHeroInfo}>
+            <div className={styles.detailMetaRow}>
+              <div className={styles.detailSkeletonMetaChip} />
+              <div className={styles.detailSkeletonMetaChip} />
+            </div>
+            <div className={styles.detailActionRow}>
+              <div className={styles.detailSkeletonAction} />
+              <div className={styles.detailSkeletonActionWide} />
+            </div>
+          </div>
+        </div>
+        <div className={styles.detailSkeletonSection} />
+      </div>
+    );
   }
 
   if (networkErrorMessage || !detailedVisualNovelData) {
