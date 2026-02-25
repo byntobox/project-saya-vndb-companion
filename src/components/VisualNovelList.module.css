@@ -747,6 +747,7 @@
 .detailRelatedSection,
 .detailContributorSection,
 .detailStoreLinkSection {
+  width: 100%;
   margin: 18px auto 0;
   max-width: 760px;
   border-radius: 14px;
@@ -1017,7 +1018,7 @@
   padding: 0;
   margin: 12px 0 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 10px;
   animation: expandIn 220ms ease;
 }
@@ -1212,8 +1213,18 @@
 
   .detailDescriptionSection,
   .detailTagSection,
-  .detailScreenshotSection {
+  .detailScreenshotSection,
+  .detailRelatedSection,
+  .detailContributorSection,
+  .detailStoreLinkSection {
     padding: 12px;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .detailScreenshotGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .floatingBackButton {

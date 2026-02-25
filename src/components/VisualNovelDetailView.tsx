@@ -63,8 +63,8 @@ export function VisualNovelDetailView({
   const [areTagsVisible, setAreTagsVisible] = useState<boolean>(false);
   const [areScreenshotsVisible, setAreScreenshotsVisible] = useState<boolean>(false);
   const [areStoreLinksVisible, setAreStoreLinksVisible] = useState<boolean>(false);
-  const [areDevelopersVisible, setAreDevelopersVisible] = useState<boolean>(false);
-  const [areRelatedTitlesVisible, setAreRelatedTitlesVisible] = useState<boolean>(false);
+  const [areDevelopersVisible, setAreDevelopersVisible] = useState<boolean>(true);
+  const [areRelatedTitlesVisible, setAreRelatedTitlesVisible] = useState<boolean>(true);
   const [maxVisibleTagSpoilerLevel, setMaxVisibleTagSpoilerLevel] = useState<0 | 1 | 2>(defaultTagSpoilerLevel);
   const [activeTagCategoryFilter, setActiveTagCategoryFilter] = useState<TagCategoryFilter>('all');
   const [tagCategoryByIdentifier, setTagCategoryByIdentifier] = useState<Record<string, string>>({});
@@ -99,8 +99,8 @@ export function VisualNovelDetailView({
     setAreTagsVisible(false);
     setAreScreenshotsVisible(false);
     setAreStoreLinksVisible(false);
-    setAreDevelopersVisible(false);
-    setAreRelatedTitlesVisible(false);
+    setAreDevelopersVisible(true);
+    setAreRelatedTitlesVisible(true);
     setMaxVisibleTagSpoilerLevel(defaultTagSpoilerLevel);
     setActiveTagCategoryFilter('all');
     setTagCategoryByIdentifier({});
@@ -757,6 +757,72 @@ export function VisualNovelDetailView({
         )}
       </div>
 
+      <div className={`${styles.detailRelatedSection} ${styles.detailSectionFull}`}>
+        <button
+          type="button"
+          className={styles.detailTagToggleButton}
+          style={themedSecondaryButtonStyle}
+          onClick={() => setAreRelatedTitlesVisible((currentState) => !currentState)}
+          aria-expanded={areRelatedTitlesVisible}
+        >
+          {areRelatedTitlesVisible ? 'Hide Related Titles' : `Show Related Titles (${relatedVisualNovelEntries.length})`}
+        </button>
+        {!areRelatedTitlesVisible && (
+          <p className={styles.detailActionMessage}>Prequels, sequels, and related entries.</p>
+        )}
+        {areRelatedTitlesVisible && isSupplementalDataLoading && <p className={styles.detailActionMessage}>Loading related titles...</p>}
+        {areRelatedTitlesVisible && relatedVisualNovelEntries.length > 0 ? (
+          <ul className={styles.relatedVisualNovelList}>
+            {relatedVisualNovelEntries.map((relationEntry) => (
+              <li key={`${relationEntry.id}-${relationEntry.relation}`} className={styles.relatedVisualNovelListItem}>
+                <button
+                  type="button"
+                  className={styles.relatedVisualNovelButton}
+                  onClick={() => onRelatedVisualNovelSelection(relationEntry.id)}
+                >
+                  <span className={styles.relatedVisualNovelRelationBadge}>{relationEntry.relationLabel}</span>
+                  <span className={styles.relatedVisualNovelTitleText}>{relationEntry.title}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : areRelatedTitlesVisible ? (
+          <p>No related titles available.</p>
+        ) : null}
+      </div>
+
+      <div className={styles.detailContributorSection}>
+        <button
+          type="button"
+          className={styles.detailTagToggleButton}
+          style={themedSecondaryButtonStyle}
+          onClick={() => setAreDevelopersVisible((currentState) => !currentState)}
+          aria-expanded={areDevelopersVisible}
+        >
+          {areDevelopersVisible ? 'Hide Developers' : `Show Developers (${developerEntries.length})`}
+        </button>
+        {!areDevelopersVisible && (
+          <p className={styles.detailActionMessage}>Studio/developer credits.</p>
+        )}
+        {areDevelopersVisible && isSupplementalDataLoading && <p className={styles.detailActionMessage}>Loading developers...</p>}
+        {areDevelopersVisible && developerEntries.length > 0 ? (
+          <div className={styles.contributorChipRow}>
+            {developerEntries.map((developerEntry) => (
+              <button
+                key={`${developerEntry.id ?? developerEntry.name}-developer`}
+                type="button"
+                className={styles.contributorChipButton}
+                onClick={() => onDeveloperSelection(developerEntry.name, developerEntry.id)}
+              >
+                {developerEntry.name}
+              </button>
+            ))}
+          </div>
+        ) : areDevelopersVisible ? (
+          <p>No developer data available.</p>
+        ) : null}
+      </div>
+
       <div className={styles.detailTagSection}>
         <button
           type="button"
@@ -845,44 +911,6 @@ export function VisualNovelDetailView({
         )}
       </div>
 
-      <div className={styles.detailStoreLinkSection}>
-        <button
-          type="button"
-          className={styles.detailTagToggleButton}
-          style={themedSecondaryButtonStyle}
-          onClick={() => setAreStoreLinksVisible((currentState) => !currentState)}
-          aria-expanded={areStoreLinksVisible}
-        >
-          {areStoreLinksVisible ? 'Hide Store Links' : `Show Store Links (${storeLinkEntries.length})`}
-        </button>
-        {!areStoreLinksVisible && (
-          <p className={styles.detailActionMessage}>Purchase links are grouped here.</p>
-        )}
-        {areStoreLinksVisible && isSupplementalDataLoading && <p className={styles.detailActionMessage}>Loading store links...</p>}
-        {areStoreLinksVisible && !isSupplementalDataLoading && storeLinkEntries.length === 0 && (
-          <p>No store links available.</p>
-        )}
-        {areStoreLinksVisible && storeLinkEntries.length > 0 && (
-          <ul className={styles.detailStoreLinkList}>
-            {storeLinkEntries.map((storeLinkEntry) => (
-              <li key={`${storeLinkEntry.url}-${storeLinkEntry.label}`} className={styles.detailStoreLinkListItem}>
-                <a
-                  href={storeLinkEntry.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.detailStoreLinkButton}
-                >
-                  <span className={styles.detailStoreLinkLabel}>{storeLinkEntry.label}</span>
-                  <span className={styles.detailStoreLinkMeta}>
-                    {storeLinkEntry.source ?? 'External'}
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
       <div className={styles.detailScreenshotSection}>
         <button
           type="button"
@@ -923,70 +951,42 @@ export function VisualNovelDetailView({
         )}
       </div>
 
-      <div className={styles.detailContributorSection}>
+      <div className={styles.detailStoreLinkSection}>
         <button
           type="button"
           className={styles.detailTagToggleButton}
           style={themedSecondaryButtonStyle}
-          onClick={() => setAreDevelopersVisible((currentState) => !currentState)}
-          aria-expanded={areDevelopersVisible}
+          onClick={() => setAreStoreLinksVisible((currentState) => !currentState)}
+          aria-expanded={areStoreLinksVisible}
         >
-          {areDevelopersVisible ? 'Hide Developers' : `Show Developers (${developerEntries.length})`}
+          {areStoreLinksVisible ? 'Hide Store Links' : `Show Store Links (${storeLinkEntries.length})`}
         </button>
-        {!areDevelopersVisible && (
-          <p className={styles.detailActionMessage}>Studio/developer credits.</p>
+        {!areStoreLinksVisible && (
+          <p className={styles.detailActionMessage}>Purchase links are grouped here.</p>
         )}
-        {areDevelopersVisible && isSupplementalDataLoading && <p className={styles.detailActionMessage}>Loading developers...</p>}
-        {areDevelopersVisible && developerEntries.length > 0 ? (
-          <div className={styles.contributorChipRow}>
-            {developerEntries.map((developerEntry) => (
-              <button
-                key={`${developerEntry.id ?? developerEntry.name}-developer`}
-                type="button"
-                className={styles.contributorChipButton}
-                onClick={() => onDeveloperSelection(developerEntry.name, developerEntry.id)}
-              >
-                {developerEntry.name}
-              </button>
-            ))}
-          </div>
-        ) : areDevelopersVisible ? (
-          <p>No developer data available.</p>
-        ) : null}
-      </div>
-
-      <div className={`${styles.detailRelatedSection} ${styles.detailSectionFull}`}>
-        <button
-          type="button"
-          className={styles.detailTagToggleButton}
-          style={themedSecondaryButtonStyle}
-          onClick={() => setAreRelatedTitlesVisible((currentState) => !currentState)}
-          aria-expanded={areRelatedTitlesVisible}
-        >
-          {areRelatedTitlesVisible ? 'Hide Related Titles' : `Show Related Titles (${relatedVisualNovelEntries.length})`}
-        </button>
-        {!areRelatedTitlesVisible && (
-          <p className={styles.detailActionMessage}>Prequels, sequels, and related entries.</p>
+        {areStoreLinksVisible && isSupplementalDataLoading && <p className={styles.detailActionMessage}>Loading store links...</p>}
+        {areStoreLinksVisible && !isSupplementalDataLoading && storeLinkEntries.length === 0 && (
+          <p>No store links available.</p>
         )}
-        {areRelatedTitlesVisible && isSupplementalDataLoading && <p className={styles.detailActionMessage}>Loading related titles...</p>}
-        {areRelatedTitlesVisible && relatedVisualNovelEntries.length > 0 ? (
-          <ul className={styles.relatedVisualNovelList}>
-            {relatedVisualNovelEntries.map((relationEntry) => (
-              <li key={`${relationEntry.id}-${relationEntry.relation}`} className={styles.relatedVisualNovelListItem}>
-                <button
-                  type="button"
-                  className={styles.relatedVisualNovelButton}
-                  onClick={() => onRelatedVisualNovelSelection(relationEntry.id)}
+        {areStoreLinksVisible && storeLinkEntries.length > 0 && (
+          <ul className={styles.detailStoreLinkList}>
+            {storeLinkEntries.map((storeLinkEntry) => (
+              <li key={`${storeLinkEntry.url}-${storeLinkEntry.label}`} className={styles.detailStoreLinkListItem}>
+                <a
+                  href={storeLinkEntry.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.detailStoreLinkButton}
                 >
-                  <span className={styles.relatedVisualNovelRelationBadge}>{relationEntry.relationLabel}</span>
-                  <span className={styles.relatedVisualNovelTitleText}>{relationEntry.title}</span>
-                </button>
+                  <span className={styles.detailStoreLinkLabel}>{storeLinkEntry.label}</span>
+                  <span className={styles.detailStoreLinkMeta}>
+                    {storeLinkEntry.source ?? 'External'}
+                  </span>
+                </a>
               </li>
             ))}
           </ul>
-        ) : areRelatedTitlesVisible ? (
-          <p>No related titles available.</p>
-        ) : null}
+        )}
       </div>
       </div>
       {activeScreenshotIndex !== null && normalizedScreenshotEntries[activeScreenshotIndex] && (
