@@ -55,6 +55,8 @@ export interface VisualNovelTagMetadataEntry {
   id: string;
   name: string;
   category: 'cont' | 'ero' | 'tech' | string;
+  description?: string | null;
+  vn_count?: number;
 }
 
 export interface VisualNovelContributorEntry {

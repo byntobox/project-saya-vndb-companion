@@ -646,6 +646,40 @@ export async function fetchTagMetadataByIds(tagIdentifiers: string[]): Promise<V
   return responsePayload;
 }
 
+export async function fetchTagEntries(searchTerm: string, pageNumber = 1, maximumResults = 50): Promise<VisualNovelTagQueryResponse> {
+  const normalizedSearchTerm = searchTerm.trim();
+  const targetApiEndpoint = buildVndbApiUrl('/tag');
+  const requestPayload = {
+    filters: normalizedSearchTerm !== '' ? ["search", "=", normalizedSearchTerm] : ["id", ">=", "g1"],
+    fields: "id, name, category, description, vn_count",
+    results: maximumResults,
+    page: pageNumber,
+    sort: normalizedSearchTerm !== '' ? 'searchrank' : 'vn_count',
+    reverse: normalizedSearchTerm === ''
+  };
+  const cacheKey = JSON.stringify(requestPayload);
+  const cachedPayload = readFromCache(tagQueryCache, cacheKey);
+  if (cachedPayload) {
+    return cachedPayload as VisualNovelTagQueryResponse;
+  }
+
+  const networkResponse = await fetch(targetApiEndpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(requestPayload)
+  });
+
+  if (!networkResponse.ok) {
+    throw new Error(`Network boundary failure: Unable to retrieve tag entries (HTTP ${networkResponse.status}).`);
+  }
+
+  const responsePayload: VisualNovelTagQueryResponse = await networkResponse.json();
+  writeToCache(tagQueryCache, cacheKey, responsePayload);
+  return responsePayload;
+}
+
 export async function fetchAuthenticatedUserVisualNovelList(
   authenticationToken: string,
   userIdentifier: string,

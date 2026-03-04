@@ -31,6 +31,7 @@ interface VisualNovelListProperties {
     username: string;
     permissions: string[];
   } | null;
+  onOpenTagExplorer: () => void;
   nsfwCoverBlurMode: 'auto' | 'always' | 'never';
   rememberListSettings: boolean;
   defaultListSortField: 'default' | 'title' | 'released' | 'rating' | 'votecount' | 'id';
@@ -70,6 +71,7 @@ export function VisualNovelList({
   tagSearchRequest,
   developerSearchRequest,
   authenticatedSession,
+  onOpenTagExplorer,
   nsfwCoverBlurMode,
   rememberListSettings,
   defaultListSortField,
@@ -950,6 +952,15 @@ export function VisualNovelList({
         />
         <button type="submit" className={styles.searchExecutionButton} style={themedPrimaryButtonStyle}>Search</button>
       </form>
+      <div className={styles.filterControlRow}>
+        <button
+          type="button"
+          className={styles.filterToggleButton}
+          onClick={onOpenTagExplorer}
+        >
+          Browse Tags
+        </button>
+      </div>
       {recentSearchTerms.length > 0 && (
         <div className={styles.recentSearchRow}>
           <span className={styles.recentSearchLabel}>Recent:</span>

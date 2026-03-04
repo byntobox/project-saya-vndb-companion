@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { VisualNovelList } from './components/VisualNovelList';
 import { VisualNovelDetailView } from './components/VisualNovelDetailView';
+import { TagExplorer } from './components/TagExplorer';
 import {
   addVisualNovelToAuthenticatedUserList,
   fetchDatabaseStatistics,
@@ -123,6 +124,7 @@ export default function RootApplication() {
   const [activeVisualNovelIdentifier, setActiveVisualNovelIdentifier] = useState<string | null>(null);
   const [activeTagSearchRequest, setActiveTagSearchRequest] = useState<TagSearchRequest | null>(null);
   const [activeDeveloperSearchRequest, setActiveDeveloperSearchRequest] = useState<DeveloperSearchRequest | null>(null);
+  const [isTagExplorerVisible, setIsTagExplorerVisible] = useState<boolean>(false);
   const [isMenuPanelVisible, setIsMenuPanelVisible] = useState<boolean>(false);
   const [tokenInputValue, setTokenInputValue] = useState<string>('');
   const [authenticatedSession, setAuthenticatedSession] = useState<AuthenticatedSession | null>(null);
@@ -345,6 +347,7 @@ export default function RootApplication() {
   }
 
   function handleNavigateToListView() {
+    setIsTagExplorerVisible(false);
     const currentHistoryState = window.history.state as { view?: string } | null;
     if (currentHistoryState?.view === 'detail') {
       window.history.back();
@@ -355,10 +358,17 @@ export default function RootApplication() {
   }
 
   function handleNavigateToHome() {
+    setIsTagExplorerVisible(false);
     setActiveTagSearchRequest(null);
     setActiveDeveloperSearchRequest(null);
     setHomeNavigationRequestToken((currentToken) => currentToken + 1);
     handleNavigateToListView();
+  }
+
+  function handleNavigateToTagExplorer() {
+    setActiveVisualNovelIdentifier(null);
+    setIsTagExplorerVisible(true);
+    setIsMenuPanelVisible(false);
   }
 
   function handleTagSelection(tagName: string, tagIdentifier?: string) {
@@ -646,7 +656,6 @@ export default function RootApplication() {
         </div>
 
         <p className="menu-drawer-note">VNDB API v2 uses API tokens for authentication.</p>
-
         <section className="menu-stats-panel">
           <h3 className="menu-stats-title">VNDB Database Stats</h3>
           {isDatabaseStatisticsLoading && <p className="menu-stats-status">Loading statistics...</p>}
@@ -692,7 +701,10 @@ export default function RootApplication() {
       </aside>
       
       <section className="data-presentation-layer">
-        <div className={`view-pane ${activeVisualNovelIdentifier === null ? 'is-visible' : 'is-hidden'}`} aria-hidden={activeVisualNovelIdentifier !== null}>
+        <div
+          className={`view-pane ${activeVisualNovelIdentifier === null && !isTagExplorerVisible ? 'is-visible' : 'is-hidden'}`}
+          aria-hidden={activeVisualNovelIdentifier !== null || isTagExplorerVisible}
+        >
           <VisualNovelList
             onVisualNovelSelection={handleNavigateToDetailView}
             onVisualNovelPrefetch={handleVisualNovelPrefetch}
@@ -703,12 +715,23 @@ export default function RootApplication() {
             onAddVisualNovelToUserList={handleAddVisualNovelToUserList}
             onUpdateVisualNovelUserListStatus={handleUpdateVisualNovelUserListStatus}
             userListRefreshToken={userListRefreshToken}
+            onOpenTagExplorer={handleNavigateToTagExplorer}
             nsfwCoverBlurMode={displayPreferences.nsfwCoverBlurMode}
             rememberListSettings={displayPreferences.rememberListSettings}
             defaultListSortField={displayPreferences.defaultListSortField}
             defaultListSortDirection={displayPreferences.defaultListSortDirection}
             defaultListOnlyWithScreenshots={displayPreferences.defaultListOnlyWithScreenshots}
             defaultListOnlyWithDescription={displayPreferences.defaultListOnlyWithDescription}
+          />
+        </div>
+
+        <div
+          className={`view-pane ${activeVisualNovelIdentifier === null && isTagExplorerVisible ? 'is-visible' : 'is-hidden'}`}
+          aria-hidden={activeVisualNovelIdentifier !== null || !isTagExplorerVisible}
+        >
+          <TagExplorer
+            onBackToSearch={handleNavigateToHome}
+            onTagSelection={(tagName, tagIdentifier) => handleTagSelection(tagName, tagIdentifier)}
           />
         </div>
 
